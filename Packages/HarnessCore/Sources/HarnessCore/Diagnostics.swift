@@ -9,7 +9,7 @@ public struct Problem: Sendable, Hashable, Identifiable, Codable {
     public var column: Int?
     public var message: String
     public var severity: Severity
-    public var source: String        // "tsc", "eslint", "swift", "cargo", "pytest", "jest"…
+    public var source: String        // "tsc", "eslint", "swift", "cargo", "pytest", "jest", "node"…
 
     public var id: String { "\(source):\(path):\(line):\(column ?? 0):\(message)" }
 
@@ -48,6 +48,17 @@ public enum DiagnosticsParser {
             p("pytest", #"^FAILED ([\w./-]+\.py)::[\w\[\]-]+ - (.+)$"#, path: 1, line: 0, message: 2),
             // jest/vitest:  ● suite › test  ...  at Object.<anonymous> (src/a.test.ts:12:5)  → keep the location line
             p("jest", #"^\s+at .*\(([\w./-]+\.(?:[cm]?[jt]sx?)):(\d+):(\d+)\)$"#, path: 1, line: 2, column: 3, message: 0),
+            // Node's built-in test runner, spec reporter (what a terminal shows):
+            //   ✖ fixed discount comes off the order once (0.31ms)
+            //     AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+            //     …
+            //       at TestContext.<anonymous> (file:///repo/test/cart.test.js:16:10)
+            // The first stack frame inside the project (not node_modules, not node:internal) is the location.
+            p("node", #"^✖ (.+?)(?: \([\d.]+m?s\))?\n\s+\w*Error[^\n]*(?:\n[^\n]*){0,12}?\n\s+at [^\n]*\((?:file://)?(/(?![^()\s]*node_modules)[^()\s:]+\.[cm]?[jt]sx?):(\d+):(\d+)\)$"#,
+              path: 2, line: 3, column: 4, message: 1),
+            // Node's test runner, TAP reporter (piped output):  not ok 2 - title … location: '/repo/test/a.test.js:15:1'
+            p("node", #"^not ok \d+ - (.+)\n(?:[^\n]*\n){0,8}?\s+location: '(?:file://)?(/[^'\n]+\.[cm]?[jt]sx?):(\d+):(\d+)'$"#,
+              path: 2, line: 3, column: 4, message: 1),
             // go test / go vet:  ./a.go:12:5: message
             p("go", #"^(\./[\w./-]+\.go):(\d+):(\d+): (.+)$"#, path: 1, line: 2, column: 3, message: 4),
         ]

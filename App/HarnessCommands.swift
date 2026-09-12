@@ -2,7 +2,7 @@ import HarnessCore
 import HarnessUI
 import SwiftUI
 
-/// App menu: the few commands that deserve a permanent home. Everything else goes through ⌘K (M6).
+/// App menu: the few commands that deserve a permanent home. Everything else goes through ⌘K.
 struct HarnessCommands: Commands {
     @Environment(\.openWindow) private var openWindow
     @FocusedValue(\.workspace) private var workspace

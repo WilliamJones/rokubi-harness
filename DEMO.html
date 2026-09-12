@@ -206,17 +206,25 @@ hands you a diff, a receipt, and Undo.</div>
   <p class="sub">Percentages hide it completely, because percentages are distributive: 10% off each of £80/£20/£40 is the same £126 as 10% off £140. Only a <strong>fixed</strong> discount exposes it — £20 off a three-line order takes £60.</p>
 
   <div class="diff">
-    <div class="dh">npm test — before (real output)</div>
-    <pre><span class="ctx">ok 1 - subtotal sums price x quantity</span>
-<span class="del">not ok 2 - fixed discount comes off the order once
-  Expected values to be strictly equal:
+    <div class="dh">npm test — before (real output, timings and Node internals trimmed)</div>
+    <pre><span class="ctx">✔ subtotal sums price x quantity</span>
+<span class="del">✖ fixed discount comes off the order once</span>
+<span class="ctx">✔ percent discount comes off the order once
+✔ no discount leaves the subtotal alone
+✔ applyDiscount rejects unknown types
+ℹ tests 5
+ℹ pass 4
+ℹ fail 1</span>
+
+<span class="del">✖ failing tests:
+
+test at test/cart.test.js:15:1
+✖ fixed discount comes off the order once
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
   80 !== 120
-  actual: 80,  expected: 120
-  at test/cart.test.js:16:10</span>
-<span class="ctx">ok 3 - percent discount comes off the order once
-ok 4 - no discount leaves the subtotal alone
-ok 5 - applyDiscount rejects unknown types</span>
-<span class="ctx"># tests 5   # pass 4   # fail 1</span></pre>
+
+      at TestContext.&lt;anonymous&gt; (file:///…/demo-project/test/cart.test.js:16:10)</span></pre>
   </div>
 </section>
 
@@ -284,13 +292,15 @@ ok 5 - applyDiscount rejects unknown types</span>
   </div>
 
   <div class="diff">
-    <div class="dh">npm test — after (real output)</div>
-    <pre><span class="add">ok 1 - subtotal sums price x quantity
-ok 2 - fixed discount comes off the order once
-ok 3 - percent discount comes off the order once
-ok 4 - no discount leaves the subtotal alone
-ok 5 - applyDiscount rejects unknown types</span>
-<span class="ctx"># tests 5   # pass 5   # fail 0</span></pre>
+    <div class="dh">npm test — after (real output, timings trimmed)</div>
+    <pre><span class="add">✔ subtotal sums price x quantity
+✔ fixed discount comes off the order once
+✔ percent discount comes off the order once
+✔ no discount leaves the subtotal alone
+✔ applyDiscount rejects unknown types</span>
+<span class="ctx">ℹ tests 5
+ℹ pass 5
+ℹ fail 0</span></pre>
   </div>
 
   <div class="note">
@@ -303,9 +313,9 @@ ok 5 - applyDiscount rejects unknown types</span>
   <div class="kicker"><span class="n">iv.</span><span class="l">Your turn</span></div>
   <h2>Do it yourself in two minutes</h2>
   <ol class="steps">
-    <li><div><b>Open the demo project.</b> Launch <code>RokubiHarness.app</code>, press <kbd>⌘O</kbd>, and choose <code>fable/demo-project</code>. It ships broken on purpose.
+    <li><div><b>Open the demo project.</b> Build and launch the app from your clone with <code>scripts/bootstrap.sh</code> (once) and <code>scripts/run.sh</code>, press <kbd>⌘O</kbd>, and choose <code>demo-project</code>. It ships broken on purpose.
       <div class="cmd"><span class="c"># confirm the bug is there first</span>
-cd fable/demo-project && npm test   <span class="c"># → 4 pass, 1 fail</span></div></div></li>
+cd demo-project && npm test   <span class="c"># → 4 pass, 1 fail</span></div></div></li>
     <li><div><b>Pick a model that can drive tools.</b> Click the model name in the title bar and search. <code>anthropic/claude-sonnet-*</code> or <code>openai/gpt-5*</code> are reliable; free <code>flash</code>/<code>mini</code>/<code>XS</code> tiers will just chat at you and never run anything.</div></li>
     <li><div><b>Set Autonomy to Full Autonomy</b> so it can run the tests without stopping to ask.</div></li>
     <li><div><b>Type four words:</b> <code>Fix the failing test.</code> then <kbd>⌘↩</kbd>. Don’t tell it which file — finding that out is its job.</div></li>
@@ -332,7 +342,7 @@ cd fable/demo-project && npm test   <span class="c"># → 4 pass, 1 fail</span><
 
 <footer>
   <p class="fin">Give it a goal. Check its receipt. Undo it if you disagree.</p>
-  <p class="narrow">The demo project lives at <code>fable/demo-project/</code> — five tests, one real bug, no dependencies to install. Reset it any time with <code>git checkout demo-project</code>, or just re-introduce the bug by hand; the whole point is that you can always get back.</p>
+  <p class="narrow">The demo project lives at <code>demo-project/</code> in the repository — five tests, one real bug, no dependencies to install. Reset it any time with <code>git checkout -- demo-project</code>, or just re-introduce the bug by hand; the whole point is that you can always get back.</p>
 </footer>
 </div>
 
@@ -350,11 +360,12 @@ cd fable/demo-project && npm test   <span class="c"># → 4 pass, 1 fail</span><
 
   var BUGGY =
     '<span style="color:#8FA0AE">export function</span> total(items, discount) {\n' +
-    '  <span style="color:#6E7885">// BUG: applied to each line, then summed</span>\n' +
+    '  <span style="color:#6E7885">// BUG: the discount is applied to each line, then summed. It should be applied</span>\n' +
+    '  <span style="color:#6E7885">// once, to the subtotal.</span>\n' +
     '  <span style="color:#8FA0AE">const</span> discounted = items.map((item) =>\n' +
     '    applyDiscount(item.price * item.quantity, discount),\n' +
     '  );\n' +
-    '  <span style="color:#8FA0AE">return</span> round(discounted.reduce((s, l) => s + l, 0));\n' +
+    '  <span style="color:#8FA0AE">return</span> round(discounted.reduce((sum, line) => sum + line, 0));\n' +
     '}';
   var FIXED =
     '<span style="color:#8FA0AE">export function</span> total(items, discount) {\n' +
@@ -382,16 +393,16 @@ cd fable/demo-project && npm test   <span class="c"># → 4 pass, 1 fail</span><
 
   var TERM_FAIL =
     '<span class="dim">$ npm test</span>\n' +
-    '<span class="ok">ok 1 - subtotal sums price x quantity</span>\n' +
-    '<span class="no">not ok 2 - fixed discount comes off the order once</span>\n' +
-    '<span class="no">  80 !== 120   (expected 120, actual 80)</span>\n' +
-    '<span class="dim">  at test/cart.test.js:16:10</span>\n' +
-    '<span class="ok">ok 3 - percent discount…   ok 4 - no discount…   ok 5 - rejects unknown</span>\n' +
-    '<span class="dim"># tests 5   # pass 4   # fail 1        exit 1</span>';
+    '<span class="ok">✔ subtotal sums price x quantity</span>\n' +
+    '<span class="no">✖ fixed discount comes off the order once</span>\n' +
+    '<span class="ok">✔ percent discount…   ✔ no discount…   ✔ rejects unknown types</span>\n' +
+    '<span class="dim">ℹ tests 5   ℹ pass 4   ℹ fail 1</span>\n' +
+    '<span class="no">  80 !== 120</span>\n' +
+    '<span class="dim">      at TestContext.&lt;anonymous&gt; (file:///…/test/cart.test.js:16:10)        exit 1</span>';
   var TERM_PASS =
     '<span class="dim">$ npm test</span>\n' +
-    '<span class="ok">ok 1  ok 2  ok 3  ok 4  ok 5</span>\n' +
-    '<span class="dim"># tests 5   # pass 5   # fail 0        exit 0</span>';
+    '<span class="ok">✔ subtotal…   ✔ fixed discount…   ✔ percent discount…   ✔ no discount…   ✔ rejects unknown types</span>\n' +
+    '<span class="dim">ℹ tests 5   ℹ pass 5   ℹ fail 0        exit 0</span>';
 
   function termHTML(body, label) {
     return '<div class="surface"><div class="head">⚡ Terminal — ' + label + '</div><pre>' + body + '</pre></div>';
@@ -405,7 +416,7 @@ cd fable/demo-project && npm test   <span class="c"># → 4 pass, 1 fail</span><
     { at: 1500, do: function (a) { add(msgs, '<div class="row"><span class="spin">●</span> Running npm test…</div>', a); } },
     { at: 2400, do: function (a) { termSlot.innerHTML = termHTML(TERM_FAIL, 'npm test'); if (a) termSlot.firstChild.classList.add('fade');
                                    msgs.lastChild.innerHTML = '<span class="tick">✓</span> Ran npm test — 1 of 5 failing'; msgs.lastChild.className = 'row bad'; } },
-    { at: 2900, do: function (a) { probSlot.innerHTML = '<div class="chip"><span class="warn">⚠</span> 1 Problem — test/cart.test.js:16<span class="btn">Fix with AI</span></div>'; if (a) probSlot.firstChild.classList.add('fade'); } },
+    { at: 2900, do: function (a) { probSlot.innerHTML = '<div class="chip"><span class="warn">⚠</span> 1 Problem<span class="btn">Fix with AI</span></div>'; if (a) probSlot.firstChild.classList.add('fade'); } },
     { at: 3300, do: function (a) { planSlot.innerHTML = planHTML(1); add(msgs, '<div class="row"><span class="tick">✓</span> Read test/cart.test.js</div>', a); } },
     { at: 3800, do: function (a) { add(msgs, '<div class="row"><span class="tick">✓</span> Read src/cart.js</div>', a); } },
     { at: 4400, do: function (a) { add(msgs, '<div class="say">The discount is applied per line, so a fixed £20 comes off three times. It should apply once, to the subtotal.</div>', a); } },

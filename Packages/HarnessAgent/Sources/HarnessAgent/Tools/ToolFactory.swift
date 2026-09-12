@@ -1,7 +1,8 @@
 import Foundation
 import HarnessCore
 
-/// Assembles the default tool set. `run_command` needs an executor (HarnessTerminal); M6 adds `git_*`.
+/// Assembles the default tool set. `run_command` needs an executor (HarnessTerminal); the git tools
+/// (`GitTools.all()`) are passed in through `extra`.
 public enum ToolFactory {
     public static func defaultTools(executor: (any CommandExecutor)? = nil, extra: [any Tool] = []) -> ToolRegistry {
         var tools: [any Tool] = [

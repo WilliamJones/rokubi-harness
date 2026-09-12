@@ -1,4 +1,4 @@
-// HarnessTerminal — SwiftTerm sessions and the PTY runner shared with agent `run_command`. Populated in M4.
+// HarnessTerminal — PTY processes, the ANSI line buffer, terminal sessions, and the command runner behind `run_command`.
 public enum HarnessTerminal {
     public static let version = "0.1.0"
 }

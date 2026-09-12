@@ -16,9 +16,10 @@ be exercised offline:
 Also serves POST /chat/completions (the OpenRouter/Chat Completions flavour) with the same scenes.
 
 Usage:  scripts/mock-openai.py [port]
-        RokubiHarness --project <copy of demo-project> --base-url http://127.0.0.1:8765 --api-key test --prompt "…"
-OpenRouter mode: RokubiHarness --project … --openrouter-key test --base-url http://127.0.0.1:8765 --prompt "…"
-See scripts/smoke.sh for the automated version.
+        open -n DerivedData/Build/Products/Debug/RokubiHarness.app --args \
+          --project <copy of demo-project> --base-url http://127.0.0.1:8765 --api-key test --prompt "…"
+OpenRouter mode: pass --openrouter-key test instead of --api-key test.
+scripts/smoke.sh runs all of this and checks the result.
 """
 import json
 import sys
@@ -31,15 +32,16 @@ LOG = []
 # ---- The scene: fix the per-line discount bug in demo-project/src/cart.js ----
 
 CART_PATH = "src/cart.js"
+# Must match demo-project/src/cart.js byte for byte, and the "real diff" shown in DEMO.html.
 BUGGY_TOTAL = """export function total(items, discount) {
-  // Rounding happens at the boundary, never mid-calculation.
-  return round(
-    items.reduce((sum, item) => sum + applyDiscount(item.price * item.quantity, discount), 0)
+  // BUG: the discount is applied to each line, then summed. It should be applied
+  // once, to the subtotal.
+  const discounted = items.map((item) =>
+    applyDiscount(item.price * item.quantity, discount),
   );
+  return round(discounted.reduce((sum, line) => sum + line, 0));
 }"""
 FIXED_TOTAL = """export function total(items, discount) {
-  // Discount applies once to the order subtotal. Rounding happens at the boundary,
-  // never mid-calculation.
   return round(applyDiscount(subtotal(items), discount));
 }"""
 

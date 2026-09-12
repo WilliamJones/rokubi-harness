@@ -1,8 +1,8 @@
 import Foundation
 import HarnessCore
 
-/// Decides whether a tool call may run. Implemented by the permission engine (M3);
-/// the M2 default allows read-only classes and denies the rest.
+/// Decides whether a tool call may run. `PermissionEngine` is the real implementation;
+/// `ReadOnlyGate` below allows read-only classes and denies the rest.
 public protocol PermissionGate: Sendable {
     func decide(tool: any Tool, arguments: JSONValue, summary: String) async -> PermissionDecision
 }

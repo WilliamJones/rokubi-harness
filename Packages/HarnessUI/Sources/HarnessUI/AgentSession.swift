@@ -37,6 +37,8 @@ public final class AgentSession {
     public private(set) var currentTaskID: String?
     /// Diagnostics parsed from the most recent command output (PRD §24). Empty = hidden.
     public var problems: [Problem] = []
+    /// Which command produced each problem, so a clean re-run of that command clears it.
+    @ObservationIgnored private var problemCommands: [Problem.ID: String] = [:]
     /// Bumped on any transcript change; the chat view keys its auto-scroll on this.
     public private(set) var contentRevision = 0
 
@@ -70,7 +72,7 @@ public final class AgentSession {
         }
     }
 
-    /// M4/M6 register run_command and git tools here.
+    /// Adds tools on top of the defaults and the git tools; the orchestrator is rebuilt on the next turn.
     public func register(tools: [any Tool]) {
         extraTools += tools
         orchestrator = nil
@@ -307,11 +309,12 @@ public final class AgentSession {
             plan = plan.map { PlanStep(title: $0.title, status: $0.status == .pending || $0.status == .inProgress ? .done : $0.status) }
         }
     }
-    fileprivate func diagnosticsReported(_ new: [Problem], source: String) {
-        // Each command's output replaces findings from the same tool family; others are kept.
-        let sources = Set(new.map(\.source))
-        problems = problems.filter { !sources.contains($0.source) } + new
-        if new.isEmpty, problems.isEmpty { return }
+    fileprivate func diagnosticsReported(_ new: [Problem], source command: String) {
+        // A command's output replaces whatever that same command reported last time (so a passing
+        // re-run of `npm test` clears its failures) and findings from the same tool family; others are kept.
+        let families = Set(new.map(\.source))
+        problems = problems.filter { problemCommands[$0.id] != command && !families.contains($0.source) } + new
+        for problem in new { problemCommands[problem.id] = command }
     }
 
     fileprivate func fileChanged(_ url: URL) {

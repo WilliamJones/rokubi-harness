@@ -2,6 +2,60 @@ import Testing
 @testable import HarnessCore
 
 @Suite struct DiagnosticsParserTests {
+    /// Real `npm test` output from demo-project in a terminal (spec reporter), paths shortened to /repo.
+    @Test func parsesNodeTestRunnerSpecReporter() {
+        let out = """
+        ✔ subtotal sums price x quantity (0.254917ms)
+        ✖ fixed discount comes off the order once (0.310125ms)
+        ✔ percent discount comes off the order once (0.044333ms)
+        ℹ tests 5
+        ℹ fail 1
+
+        ✖ failing tests:
+
+        test at test/cart.test.js:15:1
+        ✖ fixed discount comes off the order once (0.310125ms)
+          AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+          80 !== 120
+
+              at TestContext.<anonymous> (file:///repo/test/cart.test.js:16:10)
+              at Test.runInAsyncScope (node:async_hooks:211:14)
+              at Test.run (node:internal/test_runner/test:979:25)
+        """
+        let p = DiagnosticsParser.parse(out, projectRoot: .init(fileURLWithPath: "/repo"))
+        #expect(p.count == 1)
+        #expect(p.first?.source == "node")
+        #expect(p.first?.path == "test/cart.test.js" && p.first?.line == 16 && p.first?.column == 10)
+        #expect(p.first?.message == "fixed discount comes off the order once")
+    }
+
+    @Test func parsesNodeTestRunnerTAPReporter() {
+        let out = """
+        ok 1 - subtotal sums price x quantity
+        not ok 2 - fixed discount comes off the order once
+          ---
+          duration_ms: 0.4
+          type: 'test'
+          location: '/repo/test/cart.test.js:15:1'
+          failureType: 'testCodeFailure'
+        """
+        let p = DiagnosticsParser.parse(out, projectRoot: .init(fileURLWithPath: "/repo"))
+        #expect(p.count == 1)
+        #expect(p.first?.path == "test/cart.test.js" && p.first?.line == 15 && p.first?.message == "fixed discount comes off the order once")
+    }
+
+    @Test func passingNodeRunYieldsNoProblems() {
+        let out = """
+        ✔ subtotal sums price x quantity (0.259208ms)
+        ✔ fixed discount comes off the order once (0.059458ms)
+        ℹ tests 5
+        ℹ pass 5
+        ℹ fail 0
+        """
+        #expect(DiagnosticsParser.parse(out, projectRoot: .init(fileURLWithPath: "/repo")).isEmpty)
+    }
+
     @Test func parsesTypeScriptAndCompilerStyle() {
         let out = """
         src/auth/session.ts(12,5): error TS2322: Type 'string' is not assignable to type 'number'.

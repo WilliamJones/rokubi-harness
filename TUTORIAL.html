@@ -406,7 +406,7 @@
       <p>From the welcome window, <strong>Open Folder</strong> (<kbd>⌘O</kbd>), pick a recent project, or drag a folder onto the window. The harness works directly on a normal local folder &mdash; there&rsquo;s no import step and no proprietary project format.</p>
       <dl class="pairs">
         <dt>File tree</dt><dd>Hierarchical, lazy&#8209;loaded, and <code>.gitignore</code>&#8209;aware &mdash; build output and dependencies stay hidden.</dd>
-        <dt>Live updates</dt><dd>A filesystem watcher keeps the tree and open files current. Edit by hand any time; the agent notices changed files before it continues.</dd>
+        <dt>Live updates</dt><dd>A filesystem watcher keeps the tree and open files current. Edit by hand any time &mdash; the agent&rsquo;s tools read files from disk on every call, so its next edit builds on what you saved.</dd>
         <dt>File actions</dt><dd>Create, rename, move, duplicate, delete, and drag&#8209;and&#8209;drop, all from the Explorer&rsquo;s context menu.</dd>
       </dl>
     </section>
@@ -442,7 +442,7 @@
         <dt>&ldquo;Do it.&rdquo;</dt><dd>It edits.</dd>
         <dt>&ldquo;Fix the tests, keep going until they pass.&rdquo;</dt><dd>It edits, runs, diagnoses, fixes, and verifies.</dd>
       </dl>
-      <p>Conversations belong to the project and persist between sessions. Start a fresh one or reopen an earlier thread from the <strong>ChatGPT ▾</strong> menu at the top of the panel.</p>
+      <p>Conversations belong to the project and persist between sessions. Start a fresh one or reopen an earlier thread from the conversation menu at the top of the chat panel.</p>
     </section>
 
     <section id="autonomy">
@@ -496,7 +496,7 @@
       </div>
       <div class="note">
         <span class="tag">Secrets are off&#8209;limits</span>
-        <p>The agent can never read files like <code>.env</code>, <code>*.pem</code>, <code>*.key</code>, or <code>credentials.json</code>, and every path is checked to stay inside the project root.</p>
+        <p>The agent can never read files like <code>.env</code>, <code>*.pem</code>, <code>*.key</code>, or <code>credentials.json</code>, and every path is checked to stay inside the project root &mdash; symlinks included. It can&rsquo;t rename or delete a secret file to get around that either.</p>
       </div>
     </section>
 
@@ -539,8 +539,8 @@
     <section id="problems">
       <div class="grouphead"><span class="gnum">xi.</span><span class="glabel">The work</span></div>
       <h2>Problems</h2>
-      <p>When a build, type&#8209;check, lint, or test run reports errors, a <strong>⚠ Problems</strong> chip appears beneath the editor. The harness parses output from <code>tsc</code>, <code>eslint</code>, <code>swiftc</code>, <code>cargo</code>, <code>pytest</code>, and <code>jest/vitest</code> into a real list.</p>
-      <p>Each problem opens its exact location in the editor (with an inline marker), and any problem &mdash; or the whole list &mdash; can be handed straight to the agent with <strong>Fix with ChatGPT</strong>.</p>
+      <p>When a build, type&#8209;check, lint, or test run reports errors, a <strong>⚠ Problems</strong> chip appears beneath the editor. The harness parses output from <code>tsc</code>, <code>eslint</code>, <code>swiftc</code>, <code>cargo</code>, <code>pytest</code>, <code>jest/vitest</code>, and Node&rsquo;s built&#8209;in test runner into a real list.</p>
+      <p>Each problem opens its exact location in the editor (with an inline marker), and any problem &mdash; or the whole list &mdash; can be handed straight to the agent with <strong>Fix with AI</strong>.</p>
     </section>
 
     <!-- ============ THE EVIDENCE ============ -->
@@ -551,7 +551,8 @@
       <dl class="pairs">
         <dt>Accept</dt><dd>Keep a file&rsquo;s changes, or accept all.</dd>
         <dt>Reject</dt><dd>Revert a file to its pre&#8209;task state, or reject all.</dd>
-        <dt>Edit</dt><dd>The diff is editable &mdash; tweak the result by hand before you accept it.</dd>
+        <dt>Revert</dt><dd>Undo a single change inside a file from the list under the diff, keeping the rest.</dd>
+        <dt>Edit</dt><dd>Type in the right&#8209;hand pane to tweak the result by hand &mdash; your edits are saved to disk as you go.</dd>
       </dl>
     </section>
 
@@ -562,14 +563,14 @@
       <dl class="pairs">
         <dt>Undo Task</dt><dd>Restore every file the task touched to how it started.</dd>
         <dt>Revert file</dt><dd>Roll back a single file from the diff view.</dd>
-        <dt>Undo last action</dt><dd>Step back one mutating step at a time.</dd>
+        <dt>Revert change</dt><dd>Roll back one change inside a file, from the diff view.</dd>
       </dl>
     </section>
 
     <section id="git">
       <div class="grouphead"><span class="gnum">xiv.</span><span class="glabel">The evidence</span></div>
       <h2>Git, when it&rsquo;s relevant</h2>
-      <p>Git is a first&#8209;class capability but not a permanent sidebar. The agent can read <code>status</code>, <code>diff</code>, and <code>log</code>; the current branch shows in the title bar; and once you&rsquo;re happy with a task, <strong>Commit</strong> stages and commits it straight from the completion card. Committing stays a human decision.</p>
+      <p>Git is a first&#8209;class capability but not a permanent sidebar. The agent can read <code>status</code>, <code>diff</code>, and <code>log</code>, and once you&rsquo;re happy with a task, <strong>Commit</strong> stages and commits it straight from the completion card. Committing stays a human decision.</p>
     </section>
 
     <section id="verify">
@@ -614,7 +615,7 @@
     <section id="palette">
       <div class="grouphead"><span class="gnum">xvi.</span><span class="glabel">Getting around</span></div>
       <h2>The command palette &amp; keys</h2>
-      <p>Press <kbd>⌘K</kbd> for the universal escape hatch &mdash; the home for everything that doesn&rsquo;t deserve a permanent button. Fuzzy&#8209;search to open a project, review changes, run tests, format the file, open a terminal, change the model, run a skill, restore a checkpoint, or sign in.</p>
+      <p>Press <kbd>⌘K</kbd> for the universal escape hatch &mdash; the home for everything that doesn&rsquo;t deserve a permanent button. Fuzzy&#8209;search to open a project, review changes, open a terminal, format or search the current file, start a new conversation, change the model, run a skill, undo a task, or commit.</p>
       <dl class="pairs">
         <dt>⌘K</dt><dd>Command palette</dd>
         <dt>⌘O</dt><dd>Open folder</dd>
@@ -648,11 +649,10 @@
     <footer>
       <div class="measure">
         <p class="fin">Simple when the task is simple; more powerful only as the task grows.</p>
-        <p>For contributors: build with <code>scripts/build.sh</code>, test with <code>scripts/test.sh</code>, launch with <code>scripts/run.sh</code>. To exercise the agent loop offline, point a debug build at the bundled mock:</p>
-        <div class="codeblock"><span class="c"># drive the full tool loop with no network</span>
-RokubiHarness <span class="a">--project</span> ./demo \
-  <span class="a">--base-url</span> http://127.0.0.1:8765 <span class="a">--api-key</span> test \
-  <span class="a">--prompt</span> <span class="a">"Add a greeting line and verify"</span></div>
+        <p>For contributors: set up once with <code>scripts/bootstrap.sh</code>, then build with <code>scripts/build.sh</code>, test with <code>scripts/test.sh</code>, and launch with <code>scripts/run.sh</code>. To exercise the whole agent loop offline, run the smoke test: it opens a copy of <code>demo-project</code> against a scripted mock model, lets it fix the failing test, and checks that the tests pass.</p>
+        <div class="codeblock"><span class="c"># no network, no API key</span>
+scripts/smoke.sh
+scripts/smoke.sh <span class="a">--openrouter</span>   <span class="c"># same run over Chat Completions</span></div>
         <p style="color:var(--faint); font-size:13px; margin-top:24px;">ROKUBI Harness · <span style="font-family:var(--mono)">Claude Code Fable 5.1</span> · This guide describes the app&rsquo;s built features; the ChatGPT sign-in backend is undocumented and may change.</p>
       </div>
     </footer>

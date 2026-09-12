@@ -2,7 +2,8 @@
 
 Native macOS build of the ROKUBI Harness (PRD v0.4). SwiftUI + AppKit, Swift 6, Xcode 26,
 macOS 15+. Monaco runs in a `WKWebView`; the agent talks to OpenAI's Responses API via
-ChatGPT sign-in (OAuth/PKCE) with an API-key fallback behind the same `AuthProvider`.
+ChatGPT sign-in (OAuth/PKCE) or an API key, or to OpenRouter over Chat Completions, all behind `AuthProvider`.
+User-facing overview: `README.md`.
 
 ## Build & run
 - `scripts/bootstrap.sh` — one-time: fetches XcodeGen (into `.tools/`) and `npm ci` for Monaco.
@@ -10,6 +11,8 @@ ChatGPT sign-in (OAuth/PKCE) with an API-key fallback behind the same `AuthProvi
   Uses `-skipPackagePluginValidation`; the project (`RokubiHarness.xcodeproj`) is generated and gitignored.
 - `scripts/test.sh` — `swift test` for every package under `Packages/`.
 - `scripts/run.sh` — build Debug and launch.
+- `scripts/package.sh [--install]` — Release build copied to `./RokubiHarness.app` (and `/Applications`).
+- `scripts/smoke.sh [--openrouter]` — end-to-end run against the offline mock (see below).
 
 ## Architecture
 - `Packages/HarnessCore` — workspace, file service, ignore rules, file watcher, search, patch
@@ -43,7 +46,8 @@ ChatGPT sign-in (OAuth/PKCE) with an API-key fallback behind the same `AuthProvi
   agent plan → run tests → patch `src/cart.js` → re-run tests → report, then asserts the file changed and
   `npm test` passes. Screenshot at `DerivedData/smoke-<flavour>.png`. `SMOKE_SKIP_BUILD=1` reuses the build.
 - `scripts/mock-openai.py` is the scripted Responses API mock (also serves `/chat/completions` for OpenRouter mode).
-  Its scenes target `demo-project`, so keep the bug in `total()` — if `npm test` passes there, the smoke test aborts.
+  Its patch replaces `total()` verbatim, and `DEMO.html` shows that same code, so keep `demo-project/src/cart.js`
+  byte-identical to `BUGGY_TOTAL` in the mock. If `npm test` passes in `demo-project`, the smoke test aborts.
 - Manual: `open -n DerivedData/Build/Products/Debug/RokubiHarness.app --args --project <dir> --base-url http://127.0.0.1:8765 --api-key test --prompt "…"`.
   Launch through `open -n`, not the raw binary: from a non-interactive shell the raw binary may never get a window.
 - Debug-only flags: `--open <file>`, `--snapshot <png>` (+ `--snapshot-delay=<s>`, `--quit-after-snapshot`),
@@ -51,6 +55,11 @@ ChatGPT sign-in (OAuth/PKCE) with an API-key fallback behind the same `AuthProvi
 - Builds are ad-hoc signed, so every rebuild is a "new" app to the Keychain: the first launch of a fresh build
   that restores a stored key shows a Keychain access prompt (or, from a sandboxed/headless shell, blocks in
   `SecItemCopyMatching` in the background restore task). Expected; it's why smoke runs pass keys via flags.
+
+## Docs
+- `README.md` (GitHub landing page), `TUTORIAL.html` (field guide), `DEMO.html` (demo replay) describe
+  user-visible behaviour. Update them when you add, rename, or remove a button, command, shortcut, or panel.
+- `DEMO.html` quotes real terminal output from `demo-project`; regenerate it if the tests or the bug change.
 
 ## Security boundary (what the agent can and cannot do)
 - Paths: `FileService.contains` resolves symlinks on both sides, so a link inside the project pointing outside

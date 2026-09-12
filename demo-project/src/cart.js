@@ -15,10 +15,12 @@ export function applyDiscount(amount, discount) {
 }
 
 export function total(items, discount) {
-  // Rounding happens at the boundary, never mid-calculation.
-  return round(
-    items.reduce((sum, item) => sum + applyDiscount(item.price * item.quantity, discount), 0)
+  // BUG: the discount is applied to each line, then summed. It should be applied
+  // once, to the subtotal.
+  const discounted = items.map((item) =>
+    applyDiscount(item.price * item.quantity, discount),
   );
+  return round(discounted.reduce((sum, line) => sum + line, 0));
 }
 
 export function round(value) {
