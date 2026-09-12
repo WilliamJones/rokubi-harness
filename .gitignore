@@ -1,0 +1,24 @@
+# Xcode / SwiftPM
+*.xcodeproj
+*.xcworkspace
+xcuserdata/
+DerivedData/
+.build/
+.swiftpm/
+Packages/*/.build/
+*.xcresult
+
+# Generated web bundle (rebuilt by scripts/build-web.sh)
+Web/monaco/node_modules/
+Web/monaco/dist/
+Web/monaco/.workers/
+App/Resources/Monaco/
+
+# Local tooling
+.tools/
+
+# macOS
+.DS_Store
+
+# Packaged self-contained app (scripts/package.sh)
+/RokubiHarness.app

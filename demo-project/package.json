@@ -1,0 +1,10 @@
+{
+  "name": "rokubi-demo-cart",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "A tiny cart with one real bug — the demo project for the ROKUBI Harness tutorial.",
+  "scripts": {
+    "test": "node --test test/*.test.js"
+  }
+}

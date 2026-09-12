@@ -1,0 +1,697 @@
+<title>ROKUBI Harness Field Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+  :root {
+    --paper:#F6F7F9; --card:#FFFFFF; --sunk:#EEF0F3;
+    --ink:#16191F; --slate:#59626F; --faint:#8A93A0;
+    --hair:#E2E5EA; --hair-strong:#D2D7DE;
+    --accent:#0B6E62; --accent-ink:#0A5F55; --accent-wash:#E3F0ED;
+    --allow:#177245; --allow-wash:#E4F1E8;
+    --ask:#B45309; --ask-wash:#FBEEDC;
+    --deny:#B42318; --deny-wash:#FbE7E5;
+    --shadow:0 1px 2px rgba(20,25,32,.04), 0 8px 24px -12px rgba(20,25,32,.14);
+    --shadow-lift:0 2px 4px rgba(20,25,32,.05), 0 20px 40px -18px rgba(20,25,32,.22);
+    --serif:"Fraunces", Georgia, serif;
+    --sans:"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+    --mono:"IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+    --measure:68ch;
+  }
+  :root:not([data-theme="light"]) {
+    @media (prefers-color-scheme: dark) {
+      --paper:#0F1216; --card:#171B21; --sunk:#12161B;
+      --ink:#E8EBEF; --slate:#A3ACB9; --faint:#6E7885;
+      --hair:#252B33; --hair-strong:#333B45;
+      --accent:#3FB6A2; --accent-ink:#5BC7B4; --accent-wash:#132A28;
+      --allow:#4Cc47f; --allow-wash:#12241a;
+      --ask:#E0973A; --ask-wash:#2a2113;
+      --deny:#E97a6f; --deny-wash:#2a1614;
+      --shadow:0 1px 2px rgba(0,0,0,.3), 0 10px 28px -14px rgba(0,0,0,.6);
+      --shadow-lift:0 2px 6px rgba(0,0,0,.35), 0 24px 48px -20px rgba(0,0,0,.7);
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper:#0F1216; --card:#171B21; --sunk:#12161B;
+    --ink:#E8EBEF; --slate:#A3ACB9; --faint:#6E7885;
+    --hair:#252B33; --hair-strong:#333B45;
+    --accent:#3FB6A2; --accent-ink:#5BC7B4; --accent-wash:#132A28;
+    --allow:#4CC47F; --allow-wash:#12241A;
+    --ask:#E0973A; --ask-wash:#2A2113;
+    --deny:#E97A6F; --deny-wash:#2A1614;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 10px 28px -14px rgba(0,0,0,.6);
+    --shadow-lift:0 2px 6px rgba(0,0,0,.35), 0 24px 48px -20px rgba(0,0,0,.7);
+  }
+
+  * { box-sizing:border-box; }
+  html { scroll-behavior:smooth; scroll-padding-top:84px; }
+  @media (prefers-reduced-motion:reduce){ html{scroll-behavior:auto;} }
+  body {
+    margin:0; background:var(--paper); color:var(--ink);
+    font-family:var(--sans); font-size:17px; line-height:1.65;
+    -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+  }
+  a { color:var(--accent-ink); text-underline-offset:3px; text-decoration-thickness:1px; }
+
+  /* ---- top bar ---- */
+  .topbar {
+    position:sticky; top:0; z-index:50;
+    display:flex; align-items:center; gap:14px;
+    padding:12px clamp(16px,4vw,40px);
+    background:color-mix(in srgb, var(--paper) 86%, transparent);
+    backdrop-filter:saturate(1.4) blur(10px);
+    border-bottom:1px solid var(--hair);
+  }
+  .brandmark {
+    font-family:var(--serif); font-weight:600; font-size:19px; letter-spacing:.01em;
+    display:flex; align-items:center; gap:9px;
+  }
+  .seal {
+    width:26px; height:26px; border-radius:7px; flex:none;
+    background:var(--accent); color:#fff; display:grid; place-items:center;
+    font-family:var(--mono); font-weight:600; font-size:13px;
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.15);
+  }
+  .topbar .spacer { flex:1; }
+  .topbar .kbd-hint { color:var(--faint); font-size:13px; }
+  .theme-toggle {
+    font:inherit; font-size:13px; color:var(--slate); cursor:pointer;
+    background:var(--card); border:1px solid var(--hair-strong); border-radius:8px;
+    padding:5px 11px; display:inline-flex; gap:6px; align-items:center;
+  }
+  .theme-toggle:hover { border-color:var(--accent); color:var(--accent-ink); }
+
+  /* ---- shell ---- */
+  .shell { max-width:1180px; margin:0 auto; padding:0 clamp(16px,4vw,40px); }
+  .layout { display:grid; grid-template-columns:1fr; gap:0; }
+  @media (min-width:1000px){
+    .layout { grid-template-columns:232px minmax(0,1fr); gap:56px; align-items:start; }
+    .toc-wrap { position:sticky; top:76px; }
+  }
+
+  /* ---- contents rail ---- */
+  nav.toc { padding:24px 0 40px; font-size:14px; }
+  nav.toc .toc-title {
+    font-family:var(--mono); text-transform:uppercase; letter-spacing:.14em;
+    font-size:11px; color:var(--faint); margin:0 0 12px;
+  }
+  nav.toc ol { list-style:none; margin:0 0 20px; padding:0; display:flex; flex-direction:column; }
+  nav.toc .grp {
+    font-family:var(--mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase;
+    color:var(--accent-ink); margin:16px 0 6px;
+  }
+  nav.toc a {
+    color:var(--slate); text-decoration:none; padding:4px 0 4px 12px;
+    border-left:2px solid var(--hair); display:block; line-height:1.35;
+  }
+  nav.toc a:hover { color:var(--ink); border-left-color:var(--hair-strong); }
+  nav.toc a.active { color:var(--accent-ink); border-left-color:var(--accent); font-weight:600; }
+  @media (max-width:999px){ .toc-wrap{ display:none; } }
+
+  main { padding:0 0 96px; min-width:0; }
+
+  /* ---- hero ---- */
+  .hero { padding:56px 0 40px; border-bottom:1px solid var(--hair); }
+  .eyebrow {
+    font-family:var(--mono); text-transform:uppercase; letter-spacing:.2em;
+    font-size:12px; color:var(--accent-ink); margin:0 0 18px;
+  }
+  h1.title {
+    font-family:var(--serif); font-weight:600; font-size:clamp(40px,7vw,72px);
+    line-height:1.02; letter-spacing:-.015em; margin:0; text-wrap:balance;
+  }
+  h1.title em { font-style:italic; color:var(--accent-ink); }
+  .lede {
+    font-size:clamp(18px,2.4vw,21px); color:var(--slate); max-width:60ch;
+    margin:22px 0 0; text-wrap:pretty;
+  }
+  .atglance {
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+    gap:1px; margin-top:36px; background:var(--hair); border:1px solid var(--hair);
+    border-radius:12px; overflow:hidden;
+  }
+  .atglance div { background:var(--card); padding:16px 18px; }
+  .atglance dt { font-family:var(--mono); font-size:11px; letter-spacing:.1em;
+    text-transform:uppercase; color:var(--faint); margin:0 0 4px; }
+  .atglance dd { margin:0; font-weight:600; font-size:15px; }
+
+  /* ---- sections ---- */
+  section { padding:46px 0; border-bottom:1px solid var(--hair); scroll-margin-top:80px; }
+  .grouphead {
+    display:flex; align-items:baseline; gap:14px; margin:0 0 4px;
+  }
+  .grouphead .gnum {
+    font-family:var(--serif); font-style:italic; font-weight:500;
+    font-size:15px; color:var(--accent-ink);
+  }
+  .grouphead .glabel {
+    font-family:var(--mono); text-transform:uppercase; letter-spacing:.16em;
+    font-size:12px; color:var(--faint);
+  }
+  h2 {
+    font-family:var(--serif); font-weight:600; font-size:clamp(26px,3.6vw,34px);
+    line-height:1.12; letter-spacing:-.01em; margin:6px 0 14px; text-wrap:balance;
+  }
+  h3 {
+    font-size:19px; font-weight:600; margin:30px 0 8px; letter-spacing:-.005em;
+  }
+  p { max-width:var(--measure); margin:0 0 16px; }
+  .sub { color:var(--slate); }
+  strong { font-weight:600; }
+  code {
+    font-family:var(--mono); font-size:.86em; background:var(--sunk);
+    padding:2px 6px; border-radius:5px; border:1px solid var(--hair);
+    color:var(--ink); white-space:nowrap;
+  }
+  kbd {
+    font-family:var(--mono); font-size:.82em; background:var(--card);
+    border:1px solid var(--hair-strong); border-bottom-width:2px; border-radius:6px;
+    padding:1px 7px; color:var(--ink); box-shadow:0 1px 0 rgba(0,0,0,.02);
+  }
+
+  /* feature grid */
+  .cols { display:grid; gap:22px; }
+  @media (min-width:640px){ .cols.two{ grid-template-columns:1fr 1fr; } }
+  .cols p { margin-bottom:0; }
+  .cols h3 { margin-top:0; }
+
+  /* callout / note */
+  .note {
+    border-left:3px solid var(--accent); background:var(--accent-wash);
+    padding:14px 18px; border-radius:0 10px 10px 0; margin:20px 0; max-width:var(--measure);
+  }
+  .note p { margin:0; }
+  .note .tag { font-family:var(--mono); font-size:11px; letter-spacing:.1em;
+    text-transform:uppercase; color:var(--accent-ink); display:block; margin-bottom:4px; }
+
+  /* three-pane mock */
+  .pane-mock {
+    border:1px solid var(--hair-strong); border-radius:12px; overflow:hidden;
+    box-shadow:var(--shadow); background:var(--card); margin:24px 0;
+  }
+  .pane-titlebar {
+    display:flex; align-items:center; gap:8px; padding:9px 12px;
+    background:var(--sunk); border-bottom:1px solid var(--hair);
+    font-family:var(--mono); font-size:12px; color:var(--slate);
+  }
+  .dot { width:11px; height:11px; border-radius:50%; }
+  .panes { display:grid; grid-template-columns:0.9fr 1.6fr 1.2fr; min-height:190px; }
+  .panes > div { padding:14px; }
+  .panes .p-files { border-right:1px solid var(--hair); }
+  .panes .p-editor { border-right:1px solid var(--hair); background:var(--card); }
+  .panes .p-chat { background:var(--sunk); }
+  .pane-label { font-family:var(--mono); font-size:10px; letter-spacing:.14em;
+    text-transform:uppercase; color:var(--faint); margin:0 0 10px; }
+  .filerow { font-family:var(--mono); font-size:12.5px; color:var(--slate); padding:2px 0; }
+  .filerow.on { color:var(--accent-ink); font-weight:600; }
+  .codeline { font-family:var(--mono); font-size:12.5px; color:var(--slate); white-space:pre; }
+  .codeline .kw { color:var(--accent-ink); }
+  .chatbubble { font-size:12.5px; background:var(--card); border:1px solid var(--hair);
+    border-radius:9px; padding:8px 10px; color:var(--ink); }
+  @media (max-width:560px){ .panes{ grid-template-columns:1fr; }
+    .panes .p-files,.panes .p-editor{ border-right:0; border-bottom:1px solid var(--hair);} }
+
+  /* autonomy ladder */
+  .ladder { display:flex; flex-direction:column; gap:10px; margin:22px 0; max-width:var(--measure); }
+  .rung {
+    display:grid; grid-template-columns:auto 1fr; gap:14px; align-items:start;
+    border:1px solid var(--hair); border-radius:11px; padding:14px 16px; background:var(--card);
+  }
+  .rung .badge {
+    font-family:var(--mono); font-size:11px; font-weight:600; letter-spacing:.03em;
+    padding:4px 9px; border-radius:999px; white-space:nowrap; align-self:center;
+  }
+  .rung h4 { margin:0 0 3px; font-size:15.5px; font-weight:600; }
+  .rung p { margin:0; font-size:14px; color:var(--slate); max-width:none; }
+  .b-read { background:var(--sunk); color:var(--slate); border:1px solid var(--hair-strong); }
+  .b-std { background:var(--accent-wash); color:var(--accent-ink); }
+  .b-ask { background:var(--ask-wash); color:var(--ask); }
+  .b-full { background:var(--allow-wash); color:var(--allow); }
+
+  /* permission chips */
+  .permgrid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin:22px 0; max-width:var(--measure); }
+  @media (max-width:560px){ .permgrid{ grid-template-columns:1fr; } }
+  .permcol { border:1px solid var(--hair); border-radius:11px; overflow:hidden; background:var(--card); }
+  .permcol header { padding:8px 12px; font-family:var(--mono); font-size:11px;
+    letter-spacing:.12em; text-transform:uppercase; font-weight:600; }
+  .permcol.allow header { background:var(--allow-wash); color:var(--allow); }
+  .permcol.ask header { background:var(--ask-wash); color:var(--ask); }
+  .permcol.deny header { background:var(--deny-wash); color:var(--deny); }
+  .permcol ul { list-style:none; margin:0; padding:10px 12px; display:flex; flex-direction:column; gap:6px; }
+  .permcol li { font-family:var(--mono); font-size:12.5px; color:var(--slate); }
+
+  /* tool list */
+  .tools { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:1px;
+    background:var(--hair); border:1px solid var(--hair); border-radius:12px; overflow:hidden; margin:22px 0; }
+  .tool { background:var(--card); padding:13px 15px; }
+  .tool code { background:none; border:0; padding:0; color:var(--accent-ink); font-weight:600; font-size:13.5px; white-space:normal; }
+  .tool span { display:block; font-size:13px; color:var(--slate); margin-top:2px; }
+
+  /* completion card mock */
+  .completion {
+    border:1px solid var(--hair-strong); border-radius:14px; background:var(--card);
+    box-shadow:var(--shadow-lift); padding:20px 22px; margin:24px 0; max-width:var(--measure);
+  }
+  .completion .cc-tag { font-family:var(--mono); font-size:11px; letter-spacing:.18em;
+    color:var(--faint); font-weight:600; margin:0 0 8px; }
+  .completion .cc-sum { font-size:16px; font-weight:600; margin:0 0 16px; }
+  .cc-cols { display:grid; grid-template-columns:auto 1fr; gap:14px 40px; margin-bottom:18px; }
+  .cc-cols h5 { margin:0 0 6px; font-family:var(--mono); font-size:10px; letter-spacing:.1em;
+    text-transform:uppercase; color:var(--faint); font-weight:600; }
+  .cc-cols .row { display:flex; align-items:center; gap:7px; font-size:14px; padding:1px 0; }
+  .tick { width:15px; height:15px; flex:none; }
+  .cc-actions { display:flex; gap:10px; flex-wrap:wrap; }
+  .btn { font:inherit; font-size:13.5px; font-weight:500; padding:6px 14px; border-radius:8px;
+    border:1px solid var(--hair-strong); background:var(--card); color:var(--ink); cursor:default; }
+  .btn.primary { background:var(--accent); border-color:var(--accent); color:#fff; }
+  .btn.danger { color:var(--deny); border-color:color-mix(in srgb,var(--deny) 40%, var(--hair-strong)); }
+
+  /* activity rows */
+  .activity { font-family:var(--mono); font-size:13px; max-width:var(--measure);
+    border:1px solid var(--hair); border-radius:11px; background:var(--card); overflow:hidden; margin:22px 0; }
+  .activity .ar { display:flex; gap:9px; align-items:center; padding:8px 14px; border-bottom:1px solid var(--hair); color:var(--slate); }
+  .activity .ar:last-child { border-bottom:0; }
+  .activity .ar .ok { color:var(--allow); font-weight:600; }
+  .activity .ar .run { color:var(--accent-ink); }
+
+  /* verify loop */
+  .loop { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin:20px 0; max-width:var(--measure); font-family:var(--mono); font-size:12.5px; }
+  .loop .step { border:1px solid var(--hair-strong); background:var(--card); border-radius:8px; padding:6px 11px; }
+  .loop .step.key { border-color:var(--accent); color:var(--accent-ink); background:var(--accent-wash); }
+  .loop .arr { color:var(--faint); }
+
+  /* dl feature pairs */
+  dl.pairs { margin:16px 0; max-width:var(--measure); display:grid; grid-template-columns:auto 1fr; gap:6px 18px; }
+  dl.pairs dt { font-family:var(--mono); font-size:13px; color:var(--accent-ink); white-space:nowrap; }
+  dl.pairs dd { margin:0; font-size:14.5px; color:var(--slate); }
+  @media (max-width:520px){ dl.pairs{ grid-template-columns:1fr; gap:2px 0; } dl.pairs dd{ margin-bottom:10px; } }
+
+  .codeblock {
+    font-family:var(--mono); font-size:13px; line-height:1.6; background:var(--sunk);
+    border:1px solid var(--hair); border-radius:11px; padding:14px 16px; overflow-x:auto;
+    margin:18px 0; max-width:var(--measure); color:var(--ink);
+  }
+  .codeblock .c { color:var(--faint); }
+  .codeblock .a { color:var(--accent-ink); }
+
+  footer { padding:48px 0 8px; color:var(--slate); font-size:14px; }
+  footer .measure { max-width:var(--measure); }
+  footer .fin { font-family:var(--serif); font-style:italic; font-size:20px; color:var(--ink); margin:0 0 14px; }
+
+  ::selection { background:var(--accent); color:#fff; }
+  :focus-visible { outline:2px solid var(--accent); outline-offset:2px; border-radius:3px; }
+</style>
+
+<header class="topbar">
+  <span class="brandmark"><span class="seal">六</span>ROKUBI&nbsp;Harness</span>
+  <span class="spacer"></span>
+  <span class="kbd-hint">press <kbd>⌘K</kbd> for anything</span>
+  <button class="theme-toggle" id="themeBtn" aria-label="Toggle colour theme">◐ Theme</button>
+</header>
+
+<div class="shell">
+<div class="layout">
+
+  <div class="toc-wrap">
+    <nav class="toc" aria-label="Contents">
+      <p class="toc-title">Field Guide</p>
+      <p class="grp">The surface</p>
+      <ol>
+        <li><a href="#workspace">The default workspace</a></li>
+        <li><a href="#projects">Opening a project</a></li>
+        <li><a href="#editor">The editor</a></li>
+      </ol>
+      <p class="grp">The conversation</p>
+      <ol>
+        <li><a href="#intent">Intent, not modes</a></li>
+        <li><a href="#autonomy">Authority</a></li>
+        <li><a href="#context">Context &amp; skills</a></li>
+      </ol>
+      <p class="grp">The work</p>
+      <ol>
+        <li><a href="#tools">What it can do</a></li>
+        <li><a href="#permissions">Permissions</a></li>
+        <li><a href="#activity">Watching it work</a></li>
+        <li><a href="#terminal">The terminal</a></li>
+        <li><a href="#problems">Problems</a></li>
+      </ol>
+      <p class="grp">The evidence</p>
+      <ol>
+        <li><a href="#changes">Changes &amp; diffs</a></li>
+        <li><a href="#checkpoints">Checkpoints</a></li>
+        <li><a href="#git">Git</a></li>
+        <li><a href="#verify">Verified autonomy</a></li>
+      </ol>
+      <p class="grp">Getting around</p>
+      <ol>
+        <li><a href="#palette">Palette &amp; keys</a></li>
+        <li><a href="#agents">AGENTS.md</a></li>
+        <li><a href="#accounts">Accounts &amp; models</a></li>
+      </ol>
+    </nav>
+  </div>
+
+  <main>
+    <div class="hero">
+      <p class="eyebrow">Native macOS · Field Guide</p>
+      <h1 class="title">A visual control surface for an <em>autonomous</em> software engineer.</h1>
+      <p class="lede">ROKUBI Harness gives ChatGPT a goal, then shows you the work: the files it reads, the commands it runs, the diffs it writes, and the evidence that it&rsquo;s done. This guide walks every surface, from the three&#8209;pane home to the completion card.</p>
+      <dl class="atglance">
+        <div><dt>Default view</dt><dd>Files · Editor · ChatGPT</dd></div>
+        <div><dt>Everything else</dt><dd>Appears only when needed</dd></div>
+        <div><dt>Primary control</dt><dd>Authority, not modes</dd></div>
+        <div><dt>Every change</dt><dd>Reviewable &amp; reversible</dd></div>
+      </dl>
+    </div>
+
+    <!-- ============ THE SURFACE ============ -->
+    <section id="workspace">
+      <div class="grouphead"><span class="gnum">i.</span><span class="glabel">The surface</span></div>
+      <h2>The default workspace</h2>
+      <p>Open a project and the window shows three things and nothing more: your <strong>files</strong> on the left, the <strong>editor</strong> in the middle, and <strong>ChatGPT</strong> on the right. That&rsquo;s the whole interface until a task needs more of it.</p>
+
+      <div class="pane-mock" role="img" aria-label="Three-pane layout: Files, Editor, ChatGPT">
+        <div class="pane-titlebar">
+          <span class="dot" style="background:#ec6a5e"></span><span class="dot" style="background:#f4bf4f"></span><span class="dot" style="background:#61c554"></span>
+          <span style="margin-left:8px">my-project</span>
+          <span style="margin-left:auto">GPT-5 ▾</span><span>•••</span>
+        </div>
+        <div class="panes">
+          <div class="p-files">
+            <p class="pane-label">Files</p>
+            <div class="filerow">▾ src</div>
+            <div class="filerow on">&nbsp;&nbsp;auth.ts</div>
+            <div class="filerow">&nbsp;&nbsp;session.ts</div>
+            <div class="filerow">AGENTS.md</div>
+          </div>
+          <div class="p-editor">
+            <p class="pane-label">Editor</p>
+            <div class="codeline"><span class="kw">export function</span> signIn(</div>
+            <div class="codeline">&nbsp;&nbsp;email: <span class="kw">string</span></div>
+            <div class="codeline">) { … }</div>
+          </div>
+          <div class="p-chat">
+            <p class="pane-label">ChatGPT</p>
+            <div class="chatbubble">Add dark mode using the existing design system, and make the tests pass.</div>
+          </div>
+        </div>
+      </div>
+
+      <p class="sub">Terminal output, plans, diffs, problems, and Git actions all exist &mdash; they just stay out of the way and surface contextually, then recede when the task is done. A capability has to earn permanent space through frequency and necessity.</p>
+    </section>
+
+    <section id="projects">
+      <div class="grouphead"><span class="gnum">ii.</span><span class="glabel">The surface</span></div>
+      <h2>Opening a project</h2>
+      <p>From the welcome window, <strong>Open Folder</strong> (<kbd>⌘O</kbd>), pick a recent project, or drag a folder onto the window. The harness works directly on a normal local folder &mdash; there&rsquo;s no import step and no proprietary project format.</p>
+      <dl class="pairs">
+        <dt>File tree</dt><dd>Hierarchical, lazy&#8209;loaded, and <code>.gitignore</code>&#8209;aware &mdash; build output and dependencies stay hidden.</dd>
+        <dt>Live updates</dt><dd>A filesystem watcher keeps the tree and open files current. Edit by hand any time; the agent notices changed files before it continues.</dd>
+        <dt>File actions</dt><dd>Create, rename, move, duplicate, delete, and drag&#8209;and&#8209;drop, all from the Explorer&rsquo;s context menu.</dd>
+      </dl>
+    </section>
+
+    <section id="editor">
+      <div class="grouphead"><span class="gnum">iii.</span><span class="glabel">The surface</span></div>
+      <h2>The editor</h2>
+      <p>A full code editor (Monaco) sits at the centre &mdash; the same engine as VS Code. It&rsquo;s a real editing surface, not a read&#8209;only preview: everything the agent writes, you can refine by hand.</p>
+      <div class="cols two">
+        <div>
+          <h3>Editing</h3>
+          <p class="sub">Syntax highlighting, tabs, code folding, bracket matching, multiple cursors, autocomplete, and formatting.</p>
+        </div>
+        <div>
+          <h3>Commands</h3>
+          <p class="sub">Find &amp; replace (<kbd>⌘F</kbd>), format document, toggle comment (<kbd>⌘/</kbd>), go to line (<kbd>⌘L</kbd>), and save (<kbd>⌘S</kbd>).</p>
+        </div>
+      </div>
+      <div class="note">
+        <span class="tag">Human first</span>
+        <p>If a file changes on disk while you have unsaved edits, the editor tells you and lets you <strong>Reload</strong> or <strong>Keep Mine</strong> &mdash; your work is never silently overwritten.</p>
+      </div>
+    </section>
+
+    <!-- ============ THE CONVERSATION ============ -->
+    <section id="intent">
+      <div class="grouphead"><span class="gnum">iv.</span><span class="glabel">The conversation</span></div>
+      <h2>Intent comes from the conversation</h2>
+      <p>There are no Ask / Plan / Edit / Agent buttons to choose between. You just say what you want, and the harness reads your intent from the words:</p>
+      <dl class="pairs">
+        <dt>&ldquo;Explain&hellip;&rdquo;</dt><dd>It reads the relevant files and explains.</dd>
+        <dt>&ldquo;Plan how&hellip;&rdquo;</dt><dd>It investigates and produces a short plan.</dd>
+        <dt>&ldquo;Do it.&rdquo;</dt><dd>It edits.</dd>
+        <dt>&ldquo;Fix the tests, keep going until they pass.&rdquo;</dt><dd>It edits, runs, diagnoses, fixes, and verifies.</dd>
+      </dl>
+      <p>Conversations belong to the project and persist between sessions. Start a fresh one or reopen an earlier thread from the <strong>ChatGPT ▾</strong> menu at the top of the panel.</p>
+    </section>
+
+    <section id="autonomy">
+      <div class="grouphead"><span class="gnum">v.</span><span class="glabel">The conversation</span></div>
+      <h2>The one dial that matters: authority</h2>
+      <p>Instead of behavioural modes, the harness has a single persistent control &mdash; how much authority you grant the agent. Set it from <code>Autonomy&nbsp;▾</code> in the chat header.</p>
+      <div class="ladder">
+        <div class="rung"><span class="badge b-read">READ ONLY</span><div><h4>Read Only</h4><p>Can inspect, search, and read Git status &mdash; but cannot modify anything.</p></div></div>
+        <div class="rung"><span class="badge b-std">STANDARD</span><div><h4>Standard</h4><p>Reads, searches, and edits freely. Destructive or external actions ask first.</p></div></div>
+        <div class="rung"><span class="badge b-ask">ASK CMDS</span><div><h4>Ask Before Commands</h4><p>File edits proceed on their own; running terminal commands needs your approval.</p></div></div>
+        <div class="rung"><span class="badge b-full">FULL</span><div><h4>Full Autonomy</h4><p>Runs edit → test → fix → verify without stopping &mdash; still inside hard security limits.</p></div></div>
+      </div>
+      <p class="sub">Whatever the setting, a small set of dangerous actions is always blocked (see <a href="#permissions">Permissions</a>).</p>
+    </section>
+
+    <section id="context">
+      <div class="grouphead"><span class="gnum">vi.</span><span class="glabel">The conversation</span></div>
+      <h2>Point at things with <code>@</code>, run workflows with <code>/</code></h2>
+      <h3>Attach context with @</h3>
+      <p>Type <code>@</code> in the composer to hand the agent exactly what it needs &mdash; nothing more loads by default, keeping the context small and the work fast.</p>
+      <dl class="pairs">
+        <dt>@path/to/file</dt><dd>A file or folder&rsquo;s contents.</dd>
+        <dt>@selection</dt><dd>Whatever is highlighted in the editor.</dd>
+        <dt>@terminal</dt><dd>Recent terminal output.</dd>
+        <dt>@problems</dt><dd>The current diagnostics.</dd>
+        <dt>@changes</dt><dd>Files changed in this task.</dd>
+      </dl>
+      <h3>Skills with /</h3>
+      <p>A <strong>skill</strong> is just a Markdown file in <code>.rokubi/skills/</code> (or <code>~/.rokubi/skills/</code>). Type <code>/</code> to run one &mdash; its instructions are prepended to your message. Skills are how you add higher&#8209;level workflows like <code>/review</code> or <code>/deploy</code> without cluttering the interface.</p>
+    </section>
+
+    <!-- ============ THE WORK ============ -->
+    <section id="tools">
+      <div class="grouphead"><span class="gnum">vii.</span><span class="glabel">The work</span></div>
+      <h2>What the agent can actually do</h2>
+      <p>Every action goes through a structured tool &mdash; the model never gets raw access to your machine. The tools compose a few primitives: <strong>read, search, edit, create, delete, run</strong>.</p>
+      <div class="tools">
+        <div class="tool"><code>read_file</code><span>Read a file, by line range</span></div>
+        <div class="tool"><code>list_dir</code><span>List a directory</span></div>
+        <div class="tool"><code>glob</code><span>Find files by name pattern</span></div>
+        <div class="tool"><code>grep</code><span>Search file contents (regex)</span></div>
+        <div class="tool"><code>apply_patch</code><span>Precise search/replace edits</span></div>
+        <div class="tool"><code>write_file</code><span>Replace a whole file</span></div>
+        <div class="tool"><code>create_file</code><span>Make a new file</span></div>
+        <div class="tool"><code>rename_path</code><span>Move or rename</span></div>
+        <div class="tool"><code>delete_path</code><span>Move to Trash</span></div>
+        <div class="tool"><code>run_command</code><span>Run a shell command</span></div>
+        <div class="tool"><code>git_status / diff / log</code><span>Inspect the repository</span></div>
+        <div class="tool"><code>update_plan</code><span>Show a step checklist</span></div>
+        <div class="tool"><code>report_completion</code><span>Close out with evidence</span></div>
+      </div>
+      <div class="note">
+        <span class="tag">Secrets are off&#8209;limits</span>
+        <p>The agent can never read files like <code>.env</code>, <code>*.pem</code>, <code>*.key</code>, or <code>credentials.json</code>, and every path is checked to stay inside the project root.</p>
+      </div>
+    </section>
+
+    <section id="permissions">
+      <div class="grouphead"><span class="gnum">viii.</span><span class="glabel">The work</span></div>
+      <h2>Permissions, only when needed</h2>
+      <p>Each tool falls into a permission class, and your autonomy preset (plus any custom rules) decides whether it&rsquo;s allowed, asks first, or is denied. Approvals appear <strong>inline in the chat</strong> &mdash; never a modal that stops everything.</p>
+      <div class="permgrid">
+        <div class="permcol allow"><header>Allow</header><ul><li>read files</li><li>search</li><li>git status</li><li>npm test</li></ul></div>
+        <div class="permcol ask"><header>Ask</header><ul><li>install packages</li><li>delete files</li><li>git commit</li><li>network access</li></ul></div>
+        <div class="permcol deny"><header>Deny</header><ul><li>force push</li><li>rm -rf /</li><li>sudo</li><li>disk writes</li></ul></div>
+      </div>
+      <p>When the agent asks, you can <strong>Allow</strong> once, <strong>Always Allow</strong> that kind of command for the session, or <strong>Deny</strong>. Project&#8209;level rules live in <code>.rokubi/permissions.json</code>; the deny list of genuinely dangerous commands holds regardless of autonomy.</p>
+    </section>
+
+    <section id="activity">
+      <div class="grouphead"><span class="gnum">ix.</span><span class="glabel">The work</span></div>
+      <h2>Watching it work</h2>
+      <p>Instead of a wall of narration, the agent&rsquo;s actions appear as compact, collapsible activity rows inline in the conversation. You see what happened; you expand only what you want the detail on.</p>
+      <div class="activity" role="img" aria-label="Example agent activity log">
+        <div class="ar"><span class="ok">✓</span> Searched project for &ldquo;theme&rdquo;</div>
+        <div class="ar"><span class="ok">✓</span> Read 5 files</div>
+        <div class="ar"><span class="ok">✓</span> Edited src/theme.ts</div>
+        <div class="ar"><span class="run">▸</span> Ran <span style="color:var(--ink)">npm test</span> &mdash; 48 passed</div>
+      </div>
+      <p class="sub">For multi&#8209;step work the agent can post an <strong>Implementation Plan</strong> that ticks off as it goes. Simple tasks get no plan at all &mdash; planning is a contextual artifact, not a permanent panel.</p>
+    </section>
+
+    <section id="terminal">
+      <div class="grouphead"><span class="gnum">x.</span><span class="glabel">The work</span></div>
+      <h2>The terminal</h2>
+      <p>Hidden until something runs, the terminal drawer opens under the editor the first time you &mdash; or the agent &mdash; run a command. It&rsquo;s a real PTY running your login shell, so <code>PATH</code>, <code>nvm</code>, and everything else behave exactly as in Terminal.app.</p>
+      <dl class="pairs">
+        <dt>Who ran it</dt><dd>Commands the agent runs carry a <span style="color:var(--accent-ink)">⚡</span> badge; yours don&rsquo;t. Open your own shells with <kbd>⌃`</kbd>.</dd>
+        <dt>Jump to code</dt><dd>Any <code>path:line</code> in the output is clickable &mdash; it opens that spot in the editor.</dd>
+        <dt>Agent&#8209;readable</dt><dd>Output is captured (ANSI stripped) so the agent can read results and keep going.</dd>
+      </dl>
+    </section>
+
+    <section id="problems">
+      <div class="grouphead"><span class="gnum">xi.</span><span class="glabel">The work</span></div>
+      <h2>Problems</h2>
+      <p>When a build, type&#8209;check, lint, or test run reports errors, a <strong>⚠ Problems</strong> chip appears beneath the editor. The harness parses output from <code>tsc</code>, <code>eslint</code>, <code>swiftc</code>, <code>cargo</code>, <code>pytest</code>, and <code>jest/vitest</code> into a real list.</p>
+      <p>Each problem opens its exact location in the editor (with an inline marker), and any problem &mdash; or the whole list &mdash; can be handed straight to the agent with <strong>Fix with ChatGPT</strong>.</p>
+    </section>
+
+    <!-- ============ THE EVIDENCE ============ -->
+    <section id="changes">
+      <div class="grouphead"><span class="gnum">xii.</span><span class="glabel">The evidence</span></div>
+      <h2>Changes &amp; visual diffs</h2>
+      <p>After the agent edits files, a <code>4 files changed&nbsp;&nbsp;Review</code> chip appears. <strong>Review</strong> opens a focused side&#8209;by&#8209;side diff &mdash; the file&rsquo;s state when the task began on the left, the current version on the right.</p>
+      <dl class="pairs">
+        <dt>Accept</dt><dd>Keep a file&rsquo;s changes, or accept all.</dd>
+        <dt>Reject</dt><dd>Revert a file to its pre&#8209;task state, or reject all.</dd>
+        <dt>Edit</dt><dd>The diff is editable &mdash; tweak the result by hand before you accept it.</dd>
+      </dl>
+    </section>
+
+    <section id="checkpoints">
+      <div class="grouphead"><span class="gnum">xiii.</span><span class="glabel">The evidence</span></div>
+      <h2>Checkpoints &amp; undo</h2>
+      <p>Before every mutating action, the harness snapshots the file. That makes the whole task reversible &mdash; independently of Git, so it works even in a folder that isn&rsquo;t a repository.</p>
+      <dl class="pairs">
+        <dt>Undo Task</dt><dd>Restore every file the task touched to how it started.</dd>
+        <dt>Revert file</dt><dd>Roll back a single file from the diff view.</dd>
+        <dt>Undo last action</dt><dd>Step back one mutating step at a time.</dd>
+      </dl>
+    </section>
+
+    <section id="git">
+      <div class="grouphead"><span class="gnum">xiv.</span><span class="glabel">The evidence</span></div>
+      <h2>Git, when it&rsquo;s relevant</h2>
+      <p>Git is a first&#8209;class capability but not a permanent sidebar. The agent can read <code>status</code>, <code>diff</code>, and <code>log</code>; the current branch shows in the title bar; and once you&rsquo;re happy with a task, <strong>Commit</strong> stages and commits it straight from the completion card. Committing stays a human decision.</p>
+    </section>
+
+    <section id="verify">
+      <div class="grouphead"><span class="gnum">xv.</span><span class="glabel">The evidence</span></div>
+      <h2>Autonomy that ends in evidence</h2>
+      <p>For implementation work the agent runs a loop, not a single shot &mdash; and it doesn&rsquo;t just claim success, it shows it.</p>
+      <div class="loop" role="img" aria-label="Verification loop">
+        <span class="step">edit</span><span class="arr">→</span>
+        <span class="step">build / lint</span><span class="arr">→</span>
+        <span class="step">test</span><span class="arr">→</span>
+        <span class="step">inspect failure</span><span class="arr">→</span>
+        <span class="step">fix</span><span class="arr">→</span>
+        <span class="step key">verify</span>
+      </div>
+      <p>Every meaningful completion answers three questions &mdash; <strong>what changed, what was verified, and can I undo it</strong> &mdash; in a single card:</p>
+      <div class="completion" role="img" aria-label="Example TASK COMPLETE card">
+        <p class="cc-tag">TASK COMPLETE</p>
+        <p class="cc-sum">Dark mode implemented using the existing design tokens.</p>
+        <div class="cc-cols">
+          <div>
+            <h5>Changes</h5>
+            <div class="row">4 files changed</div>
+          </div>
+          <div>
+            <h5>Verified</h5>
+            <div class="row"><svg class="tick" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.2 3.2L13 5" stroke="var(--allow)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>TypeScript</div>
+            <div class="row"><svg class="tick" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.2 3.2L13 5" stroke="var(--allow)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Lint</div>
+            <div class="row"><svg class="tick" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.2 3.2L13 5" stroke="var(--allow)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>14 tests passed</div>
+            <div class="row"><svg class="tick" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.2 3.2L13 5" stroke="var(--allow)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Production build</div>
+          </div>
+        </div>
+        <div class="cc-actions">
+          <button class="btn primary">Review Changes</button>
+          <button class="btn">Commit</button>
+          <button class="btn danger">Undo Task</button>
+        </div>
+      </div>
+      <p class="sub">The card is honest about its reach: it distinguishes what was <em>implemented</em>, <em>compiled</em>, <em>linted</em>, and <em>tested</em> from what was <em>not verified</em> &mdash; it never claims a check it didn&rsquo;t run.</p>
+    </section>
+
+    <!-- ============ GETTING AROUND ============ -->
+    <section id="palette">
+      <div class="grouphead"><span class="gnum">xvi.</span><span class="glabel">Getting around</span></div>
+      <h2>The command palette &amp; keys</h2>
+      <p>Press <kbd>⌘K</kbd> for the universal escape hatch &mdash; the home for everything that doesn&rsquo;t deserve a permanent button. Fuzzy&#8209;search to open a project, review changes, run tests, format the file, open a terminal, change the model, run a skill, restore a checkpoint, or sign in.</p>
+      <dl class="pairs">
+        <dt>⌘K</dt><dd>Command palette</dd>
+        <dt>⌘O</dt><dd>Open folder</dd>
+        <dt>⌘S / ⌥⌘S</dt><dd>Save / Save all</dd>
+        <dt>⌘F</dt><dd>Find in file</dd>
+        <dt>⌃`</dt><dd>New terminal</dd>
+        <dt>⌘↩</dt><dd>Send to ChatGPT</dd>
+        <dt>⌘.</dt><dd>Stop the agent</dd>
+      </dl>
+    </section>
+
+    <section id="agents">
+      <div class="grouphead"><span class="gnum">xvii.</span><span class="glabel">Getting around</span></div>
+      <h2>Project memory: <code>AGENTS.md</code></h2>
+      <p>Drop an <code>AGENTS.md</code> in your project root and the harness always loads it as context &mdash; architecture notes, conventions, preferred libraries, forbidden patterns, the commands to build and test. It&rsquo;s the &ldquo;files before subsystems&rdquo; principle in practice: a plain file, not a settings screen.</p>
+    </section>
+
+    <section id="accounts" style="border-bottom:0;">
+      <div class="grouphead"><span class="gnum">xviii.</span><span class="glabel">Getting around</span></div>
+      <h2>Accounts &amp; models</h2>
+      <p>Sign in three ways, all behind the same interface:</p>
+      <dl class="pairs">
+        <dt>Sign in with ChatGPT</dt><dd>Uses your ChatGPT&nbsp;Plus/Pro account (OAuth). Tokens live in the macOS Keychain and refresh on their own.</dd>
+        <dt>OpenRouter</dt><dd>One key, hundreds of models from OpenAI, Anthropic, Google, Meta, Mistral and more. The harness speaks OpenRouter&rsquo;s universal Chat Completions API, so <em>any</em> model in its catalog works.</dd>
+        <dt>OpenAI API key</dt><dd>Paste a platform key instead &mdash; also stored in the Keychain.</dd>
+      </dl>
+      <h3>Finding a model</h3>
+      <p>Click the model name in the title bar to open a <strong>searchable picker</strong>: fuzzy&#8209;search by name or id, and see each model&rsquo;s context length and price per million tokens before you choose. <kbd>⌘K</kbd> → Change Model works too.</p>
+    </section>
+
+    <footer>
+      <div class="measure">
+        <p class="fin">Simple when the task is simple; more powerful only as the task grows.</p>
+        <p>For contributors: build with <code>scripts/build.sh</code>, test with <code>scripts/test.sh</code>, launch with <code>scripts/run.sh</code>. To exercise the agent loop offline, point a debug build at the bundled mock:</p>
+        <div class="codeblock"><span class="c"># drive the full tool loop with no network</span>
+RokubiHarness <span class="a">--project</span> ./demo \
+  <span class="a">--base-url</span> http://127.0.0.1:8765 <span class="a">--api-key</span> test \
+  <span class="a">--prompt</span> <span class="a">"Add a greeting line and verify"</span></div>
+        <p style="color:var(--faint); font-size:13px; margin-top:24px;">ROKUBI Harness · <span style="font-family:var(--mono)">Claude Code Fable 5.1</span> · This guide describes the app&rsquo;s built features; the ChatGPT sign-in backend is undocumented and may change.</p>
+      </div>
+    </footer>
+
+  </main>
+</div>
+</div>
+
+<script>
+  // Theme toggle: cycle system → light → dark, stamping the root as the design tokens expect.
+  (function () {
+    var order = ["system", "light", "dark"], i = 0;
+    try { var s = localStorage.getItem("rokubi-theme"); if (s) i = Math.max(0, order.indexOf(s)); } catch (e) {}
+    var root = document.documentElement;
+    function apply() {
+      var t = order[i];
+      if (t === "system") root.removeAttribute("data-theme");
+      else root.setAttribute("data-theme", t);
+      try { localStorage.setItem("rokubi-theme", t); } catch (e) {}
+    }
+    apply();
+    document.getElementById("themeBtn").addEventListener("click", function () {
+      i = (i + 1) % order.length; apply();
+    });
+  })();
+
+  // Scroll-spy: highlight the contents entry for the section in view.
+  (function () {
+    var links = Array.prototype.slice.call(document.querySelectorAll("nav.toc a"));
+    var map = {};
+    links.forEach(function (a) { map[a.getAttribute("href").slice(1)] = a; });
+    var obs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) {
+          links.forEach(function (l) { l.classList.remove("active"); });
+          var a = map[e.target.id]; if (a) a.classList.add("active");
+        }
+      });
+    }, { rootMargin: "-20% 0px -70% 0px" });
+    document.querySelectorAll("section[id]").forEach(function (s) { obs.observe(s); });
+  })();
+</script>

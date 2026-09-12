@@ -1,0 +1,23 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="bridge.css" />
+  <style>
+    html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; background: transparent; }
+    #host { position: absolute; inset: 0; }
+    #editor, #diff { position: absolute; inset: 0; }
+    #diff[hidden] { display: none; }
+    /* Match macOS: no focus ring, native-feeling scrollbars handled by Monaco. */
+    .monaco-editor .cursors-layer > .cursor { transition: none; }
+  </style>
+</head>
+<body>
+  <div id="host">
+    <div id="editor"></div>
+    <div id="diff" hidden></div>
+  </div>
+  <script src="bridge.js"></script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+{
+  "name": "rokubi-harness-monaco",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Monaco editor bundle hosted inside the ROKUBI Harness WKWebView",
+  "scripts": {
+    "build": "node build.mjs"
+  },
+  "dependencies": {
+    "monaco-editor": "0.56.0"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2"
+  }
+}

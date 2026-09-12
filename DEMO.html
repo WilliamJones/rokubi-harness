@@ -1,0 +1,468 @@
+<title>Watch The Harness Work</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+  :root{
+    --paper:#F6F7F9; --card:#FFFFFF; --sunk:#EEF0F3;
+    --ink:#16191F; --slate:#59626F; --faint:#8A93A0;
+    --hair:#E2E5EA; --hair-strong:#D2D7DE;
+    --accent:#0B6E62; --accent-ink:#0A5F55; --accent-wash:#E3F0ED;
+    --allow:#177245; --allow-wash:#E4F1E8;
+    --ask:#B45309; --ask-wash:#FBEEDC;
+    --deny:#B42318; --deny-wash:#FBE7E5;
+    /* the app-chrome mock keeps its own dark palette in both themes */
+    --app-bg:#1C1F24; --app-panel:#22262C; --app-line:#31363E; --app-ink:#E7EAEE; --app-dim:#98A1AD;
+    --shadow:0 1px 2px rgba(20,25,32,.04), 0 8px 24px -12px rgba(20,25,32,.14);
+    --lift:0 2px 6px rgba(20,25,32,.06), 0 24px 50px -22px rgba(20,25,32,.28);
+    --serif:"Fraunces",Georgia,serif; --sans:"IBM Plex Sans",ui-sans-serif,system-ui,sans-serif;
+    --mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace;
+    --measure:66ch;
+  }
+  :root:not([data-theme="light"]){ @media (prefers-color-scheme:dark){
+    --paper:#0F1216; --card:#171B21; --sunk:#12161B;
+    --ink:#E8EBEF; --slate:#A3ACB9; --faint:#6E7885;
+    --hair:#252B33; --hair-strong:#333B45;
+    --accent:#3FB6A2; --accent-ink:#5BC7B4; --accent-wash:#132A28;
+    --allow:#4CC47F; --allow-wash:#12241A;
+    --ask:#E0973A; --ask-wash:#2A2113;
+    --deny:#E97A6F; --deny-wash:#2A1614;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 10px 28px -14px rgba(0,0,0,.6);
+    --lift:0 2px 6px rgba(0,0,0,.35), 0 26px 52px -22px rgba(0,0,0,.72);
+  }}
+  :root[data-theme="dark"]{
+    --paper:#0F1216; --card:#171B21; --sunk:#12161B;
+    --ink:#E8EBEF; --slate:#A3ACB9; --faint:#6E7885;
+    --hair:#252B33; --hair-strong:#333B45;
+    --accent:#3FB6A2; --accent-ink:#5BC7B4; --accent-wash:#132A28;
+    --allow:#4CC47F; --allow-wash:#12241A;
+    --ask:#E0973A; --ask-wash:#2A2113;
+    --deny:#E97A6F; --deny-wash:#2A1614;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 10px 28px -14px rgba(0,0,0,.6);
+    --lift:0 2px 6px rgba(0,0,0,.35), 0 26px 52px -22px rgba(0,0,0,.72);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  @media (prefers-reduced-motion:reduce){ html{scroll-behavior:auto} }
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.65;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 clamp(16px,4vw,36px)}
+  .narrow{max-width:var(--measure)}
+  a{color:var(--accent-ink)}
+
+  /* ---------- hero ---------- */
+  header.hero{padding:52px 0 34px}
+  .eyebrow{font-family:var(--mono);text-transform:uppercase;letter-spacing:.2em;font-size:12px;color:var(--accent-ink);margin:0 0 16px}
+  h1{font-family:var(--serif);font-weight:600;font-size:clamp(36px,6.2vw,62px);line-height:1.03;letter-spacing:-.015em;margin:0;text-wrap:balance}
+  h1 em{font-style:italic;color:var(--accent-ink)}
+  .lede{font-size:clamp(17px,2.2vw,20px);color:var(--slate);max-width:58ch;margin:20px 0 0;text-wrap:pretty}
+
+  /* ---------- split comparison ---------- */
+  .versus{display:grid;gap:1px;background:var(--hair);border:1px solid var(--hair);border-radius:14px;overflow:hidden;margin:34px 0 8px}
+  @media(min-width:760px){ .versus{grid-template-columns:1fr 1fr} }
+  .side{background:var(--card);padding:20px 22px;display:flex;flex-direction:column;gap:10px}
+  .side.harness{background:var(--accent-wash)}
+  .side h3{margin:0;font-size:13px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.12em;color:var(--faint)}
+  .side.harness h3{color:var(--accent-ink)}
+  .said{font-size:14.5px;color:var(--slate)}
+  .stub{font-family:var(--mono);font-size:12.5px;background:var(--sunk);border:1px solid var(--hair);border-radius:8px;padding:10px 12px;color:var(--ink);overflow-x:auto}
+  .outcome{margin-top:auto;font-size:14px;font-weight:600;display:flex;align-items:center;gap:7px}
+  .outcome.cold{color:var(--slate)} .outcome.warm{color:var(--allow)}
+
+  /* ---------- sections ---------- */
+  section{padding:44px 0;border-top:1px solid var(--hair)}
+  .kicker{display:flex;gap:12px;align-items:baseline;margin-bottom:6px}
+  .kicker .n{font-family:var(--serif);font-style:italic;font-size:15px;color:var(--accent-ink)}
+  .kicker .l{font-family:var(--mono);text-transform:uppercase;letter-spacing:.16em;font-size:11.5px;color:var(--faint)}
+  h2{font-family:var(--serif);font-weight:600;font-size:clamp(25px,3.4vw,33px);line-height:1.14;margin:4px 0 14px;letter-spacing:-.01em;text-wrap:balance}
+  p{margin:0 0 15px;max-width:var(--measure)}
+  .sub{color:var(--slate)}
+  code{font-family:var(--mono);font-size:.86em;background:var(--sunk);border:1px solid var(--hair);border-radius:5px;padding:2px 6px;white-space:nowrap}
+  kbd{font-family:var(--mono);font-size:.82em;background:var(--card);border:1px solid var(--hair-strong);border-bottom-width:2px;border-radius:6px;padding:1px 7px}
+
+  /* ---------- app chrome mock (the replay stage) ---------- */
+  .stage{border-radius:14px;overflow:hidden;box-shadow:var(--lift);background:var(--app-bg);border:1px solid var(--app-line);margin:22px 0 14px}
+  .titlebar{display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--app-panel);border-bottom:1px solid var(--app-line);color:var(--app-dim);font-size:12.5px}
+  .dot{width:11px;height:11px;border-radius:50%}
+  .titlebar .name{color:var(--app-ink);font-weight:600;margin-left:6px}
+  .titlebar .model{margin-left:auto;font-family:var(--mono);font-size:12px}
+  .cols{display:grid;grid-template-columns:1fr;min-height:430px}
+  @media(min-width:860px){ .cols{grid-template-columns:150px 1.15fr 1.25fr} }
+  .col{padding:12px 14px;min-width:0}
+  .files{border-right:1px solid var(--app-line);display:none}
+  @media(min-width:860px){ .files{display:block} }
+  .center{border-right:1px solid var(--app-line);display:flex;flex-direction:column;gap:0;min-width:0}
+  .collabel{font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--app-dim);margin:0 0 9px}
+  .frow{font-family:var(--mono);font-size:12px;color:var(--app-dim);padding:2px 0}
+  .frow.hot{color:var(--accent);font-weight:600}
+  .chat{background:#191D22;display:flex;flex-direction:column;min-width:0}
+  .msgs{display:flex;flex-direction:column;gap:9px;padding:12px 14px;flex:1;overflow:hidden}
+  .bubble{align-self:flex-end;background:#2C3A4A;color:#EAF0F6;font-size:13.5px;border-radius:11px;padding:8px 11px;max-width:88%}
+  .say{color:var(--app-ink);font-size:13.5px}
+  .say b{color:#fff}
+  .row{display:flex;gap:8px;align-items:flex-start;font-family:var(--mono);font-size:12.5px;color:var(--app-dim)}
+  .row .tick{color:#4CC47F;flex:none}
+  .row .spin{color:var(--accent);flex:none}
+  .row.bad .tick{color:#E97A6F}
+
+  /* contextual surfaces inside the stage */
+  .surface{border-top:1px solid var(--app-line);background:var(--app-panel);font-family:var(--mono);font-size:12px;color:var(--app-dim)}
+  .surface .head{display:flex;gap:8px;align-items:center;padding:6px 12px;border-bottom:1px solid var(--app-line);color:var(--app-ink)}
+  .surface pre{margin:0;padding:10px 12px;overflow-x:auto;line-height:1.55;color:var(--app-dim);font-size:11.5px;white-space:pre}
+  .surface pre .ok{color:#4CC47F} .surface pre .no{color:#E97A6F} .surface pre .dim{color:#6E7885}
+  .chip{display:flex;align-items:center;gap:8px;padding:6px 12px;border-top:1px solid var(--app-line);background:var(--app-panel);font-family:var(--mono);font-size:11.5px}
+  .chip .warn{color:#E0973A} .chip .edit{color:var(--accent)}
+  .chip .btn{margin-left:auto;border:1px solid var(--app-line);border-radius:6px;padding:2px 9px;color:var(--app-ink);background:#2A2F37}
+  .plan{padding:8px 12px;border-top:1px solid var(--app-line);background:var(--app-panel);font-size:12px}
+  .plan .t{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--app-dim);margin-bottom:5px}
+  .plan .s{display:flex;gap:7px;align-items:center;color:var(--app-dim);padding:1px 0}
+  .plan .s .m{width:11px;flex:none;text-align:center}
+  .plan .s.done{color:#8FA0AE} .plan .s.done .m{color:#4CC47F}
+  .plan .s.now .m{color:var(--accent)} .plan .s.now{color:var(--app-ink)}
+
+  /* completion card inside the stage */
+  .done{margin:10px 14px 14px;border:1px solid var(--app-line);background:#1F242A;border-radius:11px;padding:13px 15px}
+  .done .tag{font-family:var(--mono);font-size:10px;letter-spacing:.18em;color:var(--app-dim);font-weight:600;margin-bottom:6px}
+  .done .sum{color:var(--app-ink);font-size:13.5px;font-weight:600;margin-bottom:11px}
+  .done .grid{display:flex;gap:34px;flex-wrap:wrap;margin-bottom:12px}
+  .done h5{margin:0 0 5px;font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--app-dim)}
+  .done .v{display:flex;gap:6px;align-items:center;color:var(--app-dim);font-size:12.5px;padding:1px 0}
+  .done .v .y{color:#4CC47F} .done .v .q{color:#E0973A}
+  .acts{display:flex;gap:8px;flex-wrap:wrap}
+  .acts span{border:1px solid var(--app-line);border-radius:7px;padding:3px 10px;font-size:12px;color:var(--app-ink);background:#2A2F37}
+  .acts span.pri{background:var(--accent);border-color:var(--accent);color:#04211D;font-weight:600}
+  .acts span.dang{color:#E97A6F}
+
+  .controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:0 0 6px}
+  .controls button{font:inherit;font-size:14px;font-weight:500;padding:7px 15px;border-radius:9px;border:1px solid var(--hair-strong);background:var(--card);color:var(--ink);cursor:pointer}
+  .controls button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+  .controls button:hover{border-color:var(--accent)}
+  .controls .status{font-family:var(--mono);font-size:12px;color:var(--faint)}
+  .fade{animation:fade .32s ease both}
+  @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+  @media(prefers-reduced-motion:reduce){ .fade{animation:none} }
+
+  /* ---------- diff ---------- */
+  .diff{border:1px solid var(--hair);border-radius:11px;overflow:hidden;margin:18px 0;font-family:var(--mono);font-size:12.5px;background:var(--card)}
+  .diff .dh{padding:7px 12px;background:var(--sunk);border-bottom:1px solid var(--hair);color:var(--slate);font-size:11.5px}
+  .diff pre{margin:0;padding:11px 12px;overflow-x:auto;line-height:1.6}
+  .diff .del{color:var(--deny);background:var(--deny-wash);display:block}
+  .diff .add{color:var(--allow);background:var(--allow-wash);display:block}
+  .diff .ctx{color:var(--slate);display:block}
+
+  .note{border-left:3px solid var(--accent);background:var(--accent-wash);padding:13px 17px;border-radius:0 10px 10px 0;margin:18px 0;max-width:var(--measure)}
+  .note p{margin:0}
+  .note .t{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent-ink);display:block;margin-bottom:3px}
+
+  ol.steps{max-width:var(--measure);padding-left:0;list-style:none;counter-reset:s;display:flex;flex-direction:column;gap:14px}
+  ol.steps li{counter-increment:s;display:grid;grid-template-columns:auto 1fr;gap:13px;align-items:start}
+  ol.steps li::before{content:counter(s);font-family:var(--mono);font-size:11px;font-weight:600;color:var(--accent-ink);background:var(--accent-wash);border-radius:50%;width:23px;height:23px;display:grid;place-items:center;margin-top:2px}
+  ol.steps b{font-weight:600}
+  .cmd{font-family:var(--mono);font-size:12.5px;background:var(--sunk);border:1px solid var(--hair);border-radius:9px;padding:11px 13px;overflow-x:auto;margin:9px 0 0;color:var(--ink)}
+  .cmd .c{color:var(--faint)}
+
+  footer{padding:40px 0 70px;color:var(--slate);font-size:14px}
+  footer .fin{font-family:var(--serif);font-style:italic;font-size:19px;color:var(--ink);margin:0 0 12px}
+  ::selection{background:var(--accent);color:#fff}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+</style>
+
+<div class="wrap">
+
+<header class="hero">
+  <p class="eyebrow">ROKUBI Harness · a real run, replayed</p>
+  <h1>Same prompt. Two <em>very</em> different things happen.</h1>
+  <p class="lede">Everything below is a genuine run against the <code>demo-project/</code> that ships in this repo — a shopping cart with one real bug and a real failing test. Nothing here is mocked up.</p>
+
+  <div class="versus">
+    <div class="side">
+      <h3>A chat sidebar</h3>
+      <p class="said">You: “Fix the failing test.”</p>
+      <div class="stub">It replies with a code block:
+
+export function total(items, d) {
+  return round(applyDiscount(
+    subtotal(items), d));
+}
+
+“Try replacing your total() with this.”</div>
+      <p class="outcome cold">→ You still have to paste it, run the tests, and hope</p>
+    </div>
+    <div class="side harness">
+      <h3>The harness</h3>
+      <p class="said">You: “Fix the failing test.”</p>
+      <div class="stub">It runs npm test, reads the failure,
+reads both files, edits src/cart.js,
+re-runs npm test — 5 passed — and
+hands you a diff, a receipt, and Undo.</div>
+      <p class="outcome warm">→ The bug is actually fixed, and proven</p>
+    </div>
+  </div>
+</header>
+
+<section id="project">
+  <div class="kicker"><span class="n">i.</span><span class="l">The demo project</span></div>
+  <h2>One real bug, hiding in plain sight</h2>
+  <p><code>demo-project/</code> is a tiny cart with five tests. Four pass. One fails — and the bug is the kind that survives code review: the discount is applied to <em>every line</em> instead of once to the order.</p>
+  <p class="sub">Percentages hide it completely, because percentages are distributive: 10% off each of £80/£20/£40 is the same £126 as 10% off £140. Only a <strong>fixed</strong> discount exposes it — £20 off a three-line order takes £60.</p>
+
+  <div class="diff">
+    <div class="dh">npm test — before (real output)</div>
+    <pre><span class="ctx">ok 1 - subtotal sums price x quantity</span>
+<span class="del">not ok 2 - fixed discount comes off the order once
+  Expected values to be strictly equal:
+  80 !== 120
+  actual: 80,  expected: 120
+  at test/cart.test.js:16:10</span>
+<span class="ctx">ok 3 - percent discount comes off the order once
+ok 4 - no discount leaves the subtotal alone
+ok 5 - applyDiscount rejects unknown types</span>
+<span class="ctx"># tests 5   # pass 4   # fail 1</span></pre>
+  </div>
+</section>
+
+<section id="replay">
+  <div class="kicker"><span class="n">ii.</span><span class="l">The run</span></div>
+  <h2>Watch it work</h2>
+  <p>This is the whole task, replayed at the pace it happens. Notice what appears <em>on its own</em>: a plan, a terminal, a problems chip, a changes counter — then all of it recedes into a receipt.</p>
+
+  <div class="controls">
+    <button class="primary" id="replayBtn">↻ Replay the run</button>
+    <span class="status" id="status">showing the finished run</span>
+  </div>
+
+  <div class="stage">
+    <div class="titlebar">
+      <span class="dot" style="background:#ec6a5e"></span><span class="dot" style="background:#f4bf4f"></span><span class="dot" style="background:#61c554"></span>
+      <span class="name">demo-project</span>
+      <span class="model">claude-sonnet · Full Autonomy</span>
+    </div>
+    <div class="cols">
+      <div class="col files">
+        <p class="collabel">Files</p>
+        <div class="frow">▾ src</div>
+        <div class="frow hot" id="f-cart">&nbsp;&nbsp;cart.js</div>
+        <div class="frow">▾ test</div>
+        <div class="frow">&nbsp;&nbsp;cart.test.js</div>
+        <div class="frow">AGENTS.md</div>
+        <div class="frow">package.json</div>
+      </div>
+
+      <div class="col center" style="padding:0">
+        <div style="padding:12px 14px 6px"><p class="collabel">Editor — src/cart.js</p></div>
+        <div id="editorArea" style="padding:0 14px 10px;font-family:var(--mono);font-size:11.5px;line-height:1.65;color:var(--app-dim);overflow-x:auto"></div>
+        <div id="planSlot"></div>
+        <div id="termSlot"></div>
+        <div id="probSlot"></div>
+      </div>
+
+      <div class="chat">
+        <div class="msgs" id="msgs"></div>
+        <div id="chipSlot"></div>
+        <div id="doneSlot"></div>
+      </div>
+    </div>
+  </div>
+  <p class="sub" style="font-size:14px">Every line above comes from the real run: the failure text, the edit, the second test result, and the verification list.</p>
+</section>
+
+<section id="receipt">
+  <div class="kicker"><span class="n">iii.</span><span class="l">The evidence</span></div>
+  <h2>It ends with a receipt, not a claim</h2>
+  <p>A chat assistant finishes by saying “I’ve fixed it.” The harness finishes with what it changed, what it actually ran, and a way back. It also marks what it <em>didn’t</em> verify — it never claims a check it didn’t run.</p>
+
+  <div class="diff">
+    <div class="dh">the edit it made — src/cart.js (real diff)</div>
+    <pre><span class="ctx"> export function total(items, discount) {</span>
+<span class="del">-  // BUG: the discount is applied to each line, then summed. It should be applied
+-  // once, to the subtotal.
+-  const discounted = items.map((item) =>
+-    applyDiscount(item.price * item.quantity, discount),
+-  );
+-  return round(discounted.reduce((sum, line) => sum + line, 0));</span>
+<span class="add">+  return round(applyDiscount(subtotal(items), discount));</span>
+<span class="ctx"> }</span></pre>
+  </div>
+
+  <div class="diff">
+    <div class="dh">npm test — after (real output)</div>
+    <pre><span class="add">ok 1 - subtotal sums price x quantity
+ok 2 - fixed discount comes off the order once
+ok 3 - percent discount comes off the order once
+ok 4 - no discount leaves the subtotal alone
+ok 5 - applyDiscount rejects unknown types</span>
+<span class="ctx"># tests 5   # pass 5   # fail 0</span></pre>
+  </div>
+
+  <div class="note">
+    <span class="t">The part no sidebar has</span>
+    <p><strong>Undo Task</strong> restores every file the task touched to exactly how it started — checkpointed before each edit, independent of Git, so it works even in a folder that isn’t a repository. Click it and the bug comes back.</p>
+  </div>
+</section>
+
+<section id="try">
+  <div class="kicker"><span class="n">iv.</span><span class="l">Your turn</span></div>
+  <h2>Do it yourself in two minutes</h2>
+  <ol class="steps">
+    <li><div><b>Open the demo project.</b> Launch <code>RokubiHarness.app</code>, press <kbd>⌘O</kbd>, and choose <code>fable/demo-project</code>. It ships broken on purpose.
+      <div class="cmd"><span class="c"># confirm the bug is there first</span>
+cd fable/demo-project && npm test   <span class="c"># → 4 pass, 1 fail</span></div></div></li>
+    <li><div><b>Pick a model that can drive tools.</b> Click the model name in the title bar and search. <code>anthropic/claude-sonnet-*</code> or <code>openai/gpt-5*</code> are reliable; free <code>flash</code>/<code>mini</code>/<code>XS</code> tiers will just chat at you and never run anything.</div></li>
+    <li><div><b>Set Autonomy to Full Autonomy</b> so it can run the tests without stopping to ask.</div></li>
+    <li><div><b>Type four words:</b> <code>Fix the failing test.</code> then <kbd>⌘↩</kbd>. Don’t tell it which file — finding that out is its job.</div></li>
+    <li><div><b>Watch, then check.</b> When the receipt appears, hit <b>Review Changes</b> for the diff, then <b>Undo Task</b> — and run <code>npm test</code> again to see the failure return.</div></li>
+  </ol>
+  <div class="note">
+    <span class="t">If it just chats at you</span>
+    <p>That’s the model, not the harness — a weak model never calls the tools. Switch to a stronger one and send the same four words again.</p>
+  </div>
+</section>
+
+<section id="why" style="border-bottom:0">
+  <div class="kicker"><span class="n">v.</span><span class="l">The difference</span></div>
+  <h2>What you just watched</h2>
+  <p>Four things happened that a chat sidebar structurally cannot do — and one thing that <em>didn’t</em>.</p>
+  <ol class="steps">
+    <li><div><b>It reproduced the bug before touching code.</b> The first thing it ran was your test suite, so it was working from evidence, not a guess.</div></li>
+    <li><div><b>It edited real files and re-ran the suite.</b> Edit → test → verify, on its own, until green.</div></li>
+    <li><div><b>It reported honestly.</b> “5 tests passed” is a fact it observed; the lint row says <em>not run</em> because it wasn’t.</div></li>
+    <li><div><b>All of it is reversible.</b> One click puts every file back, no Git required.</div></li>
+    <li><div><b>And the interface stayed out of the way.</b> The terminal, plan, and problems panels appeared only while they were useful, then collapsed. That’s the design principle — the harness is as simple as the task allows, and no simpler.</div></li>
+  </ol>
+</section>
+
+<footer>
+  <p class="fin">Give it a goal. Check its receipt. Undo it if you disagree.</p>
+  <p class="narrow">The demo project lives at <code>fable/demo-project/</code> — five tests, one real bug, no dependencies to install. Reset it any time with <code>git checkout demo-project</code>, or just re-introduce the bug by hand; the whole point is that you can always get back.</p>
+</footer>
+</div>
+
+<script>
+(function () {
+  var msgs = document.getElementById('msgs');
+  var planSlot = document.getElementById('planSlot');
+  var termSlot = document.getElementById('termSlot');
+  var probSlot = document.getElementById('probSlot');
+  var chipSlot = document.getElementById('chipSlot');
+  var doneSlot = document.getElementById('doneSlot');
+  var editor   = document.getElementById('editorArea');
+  var statusEl = document.getElementById('status');
+  var btn      = document.getElementById('replayBtn');
+
+  var BUGGY =
+    '<span style="color:#8FA0AE">export function</span> total(items, discount) {\n' +
+    '  <span style="color:#6E7885">// BUG: applied to each line, then summed</span>\n' +
+    '  <span style="color:#8FA0AE">const</span> discounted = items.map((item) =>\n' +
+    '    applyDiscount(item.price * item.quantity, discount),\n' +
+    '  );\n' +
+    '  <span style="color:#8FA0AE">return</span> round(discounted.reduce((s, l) => s + l, 0));\n' +
+    '}';
+  var FIXED =
+    '<span style="color:#8FA0AE">export function</span> total(items, discount) {\n' +
+    '  <span style="color:#8FA0AE">return</span> round(applyDiscount(subtotal(items), discount));\n' +
+    '}';
+
+  function el(html) { var d = document.createElement('div'); d.innerHTML = html.trim(); return d.firstChild; }
+  function add(parent, html, animate) {
+    var node = el(html);
+    if (animate) node.classList.add('fade');
+    parent.appendChild(node);
+    return node;
+  }
+
+  var PLAN_STEPS = ['Reproduce the failure', 'Locate the cause', 'Fix total()', 'Re-run the suite'];
+  function planHTML(activeIndex) {
+    var rows = PLAN_STEPS.map(function (t, i) {
+      var cls = i < activeIndex ? 'done' : (i === activeIndex ? 'now' : '');
+      var mark = i < activeIndex ? '✓' : (i === activeIndex ? '●' : '○');
+      return '<div class="s ' + cls + '"><span class="m">' + mark + '</span>' + t + '</div>';
+    }).join('');
+    return '<div class="plan"><div class="t">Implementation plan · ' +
+      Math.min(activeIndex, PLAN_STEPS.length) + '/' + PLAN_STEPS.length + '</div>' + rows + '</div>';
+  }
+
+  var TERM_FAIL =
+    '<span class="dim">$ npm test</span>\n' +
+    '<span class="ok">ok 1 - subtotal sums price x quantity</span>\n' +
+    '<span class="no">not ok 2 - fixed discount comes off the order once</span>\n' +
+    '<span class="no">  80 !== 120   (expected 120, actual 80)</span>\n' +
+    '<span class="dim">  at test/cart.test.js:16:10</span>\n' +
+    '<span class="ok">ok 3 - percent discount…   ok 4 - no discount…   ok 5 - rejects unknown</span>\n' +
+    '<span class="dim"># tests 5   # pass 4   # fail 1        exit 1</span>';
+  var TERM_PASS =
+    '<span class="dim">$ npm test</span>\n' +
+    '<span class="ok">ok 1  ok 2  ok 3  ok 4  ok 5</span>\n' +
+    '<span class="dim"># tests 5   # pass 5   # fail 0        exit 0</span>';
+
+  function termHTML(body, label) {
+    return '<div class="surface"><div class="head">⚡ Terminal — ' + label + '</div><pre>' + body + '</pre></div>';
+  }
+
+  // The run, as it actually happened.
+  var STEPS = [
+    { at: 0,    do: function (a) { add(msgs, '<div class="bubble">Fix the failing test.</div>', a); } },
+    { at: 500,  do: function (a) { add(msgs, '<div class="say">I’ll run the suite first to see what’s failing.</div>', a); } },
+    { at: 1100, do: function (a) { planSlot.innerHTML = planHTML(0); if (a) planSlot.firstChild.classList.add('fade'); } },
+    { at: 1500, do: function (a) { add(msgs, '<div class="row"><span class="spin">●</span> Running npm test…</div>', a); } },
+    { at: 2400, do: function (a) { termSlot.innerHTML = termHTML(TERM_FAIL, 'npm test'); if (a) termSlot.firstChild.classList.add('fade');
+                                   msgs.lastChild.innerHTML = '<span class="tick">✓</span> Ran npm test — 1 of 5 failing'; msgs.lastChild.className = 'row bad'; } },
+    { at: 2900, do: function (a) { probSlot.innerHTML = '<div class="chip"><span class="warn">⚠</span> 1 Problem — test/cart.test.js:16<span class="btn">Fix with AI</span></div>'; if (a) probSlot.firstChild.classList.add('fade'); } },
+    { at: 3300, do: function (a) { planSlot.innerHTML = planHTML(1); add(msgs, '<div class="row"><span class="tick">✓</span> Read test/cart.test.js</div>', a); } },
+    { at: 3800, do: function (a) { add(msgs, '<div class="row"><span class="tick">✓</span> Read src/cart.js</div>', a); } },
+    { at: 4400, do: function (a) { add(msgs, '<div class="say">The discount is applied per line, so a fixed £20 comes off three times. It should apply once, to the subtotal.</div>', a); } },
+    { at: 5200, do: function (a) { planSlot.innerHTML = planHTML(2); editor.innerHTML = FIXED; if (a) { editor.classList.remove('fade'); void editor.offsetWidth; editor.classList.add('fade'); }
+                                   add(msgs, '<div class="row"><span class="tick">✓</span> Edited src/cart.js</div>', a); } },
+    { at: 5700, do: function (a) { chipSlot.innerHTML = '<div class="chip"><span class="edit">✎</span> 1 file changed<span class="btn">Review</span></div>'; if (a) chipSlot.firstChild.classList.add('fade'); } },
+    { at: 6200, do: function (a) { planSlot.innerHTML = planHTML(3); add(msgs, '<div class="row"><span class="spin">●</span> Re-running npm test…</div>', a); } },
+    { at: 7100, do: function (a) { termSlot.innerHTML = termHTML(TERM_PASS, 'npm test'); if (a) termSlot.firstChild.classList.add('fade');
+                                   msgs.lastChild.innerHTML = '<span class="tick">✓</span> Ran npm test — 5 passed';
+                                   probSlot.innerHTML = ''; } },
+    { at: 7700, do: function (a) { planSlot.innerHTML = planHTML(4); } },
+    { at: 8100, do: function (a) {
+        doneSlot.innerHTML =
+          '<div class="done"><div class="tag">TASK COMPLETE</div>' +
+          '<div class="sum">Discount is now applied once to the order subtotal.</div>' +
+          '<div class="grid"><div><h5>Changes</h5><div class="v">1 file changed</div><div class="v" style="font-family:var(--mono);font-size:11.5px">src/cart.js</div></div>' +
+          '<div><h5>Verified</h5>' +
+          '<div class="v"><span class="y">✓</span> Tests — 5 passed</div>' +
+          '<div class="v"><span class="y">✓</span> Reproduced before fixing</div>' +
+          '<div class="v"><span class="q">?</span> Lint — not run</div></div></div>' +
+          '<div class="acts"><span class="pri">Review Changes</span><span>Commit</span><span class="dang">Undo Task</span></div></div>';
+        if (a) doneSlot.firstChild.classList.add('fade');
+        chipSlot.innerHTML = '';
+      } }
+  ];
+
+  var timers = [];
+  function reset() {
+    timers.forEach(clearTimeout); timers = [];
+    msgs.innerHTML = ''; planSlot.innerHTML = ''; termSlot.innerHTML = '';
+    probSlot.innerHTML = ''; chipSlot.innerHTML = ''; doneSlot.innerHTML = '';
+    editor.innerHTML = BUGGY;
+  }
+
+  // At rest the page shows the finished run, so nothing is hidden behind a click.
+  function showFinal() {
+    reset();
+    STEPS.forEach(function (s) { s.do(false); });
+    statusEl.textContent = 'showing the finished run';
+  }
+
+  function play() {
+    var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduced) { showFinal(); return; }
+    reset();
+    btn.disabled = true;
+    statusEl.textContent = 'replaying…';
+    STEPS.forEach(function (s) {
+      timers.push(setTimeout(function () { s.do(true); }, s.at));
+    });
+    timers.push(setTimeout(function () {
+      btn.disabled = false;
+      statusEl.textContent = 'done — 5 tests passing, fully reversible';
+    }, 8600));
+  }
+
+  showFinal();
+  btn.addEventListener('click', play);
+})();
+</script>
