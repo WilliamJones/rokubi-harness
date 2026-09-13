@@ -294,12 +294,55 @@
   .codeblock .c { color:var(--faint); }
   .codeblock .a { color:var(--accent-ink); }
 
+  /* copy-and-paste snippets */
+  .codeblock { position:relative; white-space:pre; }
+  .snip { margin:18px 0; max-width:none; }
+  .snip .codeblock { max-width:none; }
+  .snip .where {
+    display:flex; align-items:center; gap:8px; margin:0 0 6px;
+    font-family:var(--mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--faint);
+  }
+  .snip .where { max-width:none; min-height:26px; }
+  .snip .where b { color:var(--accent-ink); font-weight:600; }
+  .snip .where .copybtn { position:static; margin-left:auto; text-transform:none; letter-spacing:0; }
+  .snip .codeblock { margin:0; }
+  .codeblock.prompt { font-family:var(--sans); font-size:15px; white-space:pre-wrap; background:var(--card); border-color:var(--hair-strong); }
+  .copybtn {
+    position:absolute; top:8px; right:8px; font:inherit; font-family:var(--sans); font-size:12px; font-weight:500;
+    color:var(--slate); background:var(--card); border:1px solid var(--hair-strong); border-radius:7px;
+    padding:3px 10px; cursor:pointer; line-height:1.5;
+  }
+  .copybtn:hover { color:var(--accent-ink); border-color:var(--accent); }
+  .copybtn.done { color:var(--allow); border-color:var(--allow); }
+
   footer { padding:48px 0 8px; color:var(--slate); font-size:14px; }
   footer .measure { max-width:var(--measure); }
   footer .fin { font-family:var(--serif); font-style:italic; font-size:20px; color:var(--ink); margin:0 0 14px; }
 
   ::selection { background:var(--accent); color:#fff; }
   :focus-visible { outline:2px solid var(--accent); outline-offset:2px; border-radius:3px; }
+  /* reference tables */
+  .tablewrap { overflow-x:auto; margin:18px 0; border:1px solid var(--hair); border-radius:11px; background:var(--card); }
+  table.ref { border-collapse:collapse; width:100%; font-size:14.5px; line-height:1.5; }
+  table.ref th { font-family:var(--mono); font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--faint);
+    text-align:left; font-weight:600; padding:9px 14px; background:var(--sunk); border-bottom:1px solid var(--hair); white-space:nowrap; }
+  table.ref td { padding:9px 14px; border-bottom:1px solid var(--hair); vertical-align:top; color:var(--slate); }
+  table.ref tr:last-child td { border-bottom:0; }
+  table.ref td:first-child { color:var(--ink); }
+  table.ref code, table.ref kbd { white-space:nowrap; }
+  .d { font-family:var(--mono); font-size:11.5px; font-weight:600; padding:2px 8px; border-radius:999px; white-space:nowrap; }
+  .d.allow { background:var(--allow-wash); color:var(--allow); }
+  .d.ask { background:var(--ask-wash); color:var(--ask); }
+  .d.deny { background:var(--deny-wash); color:var(--deny); }
+
+  /* warnings and step lists */
+  .note.warn { border-left-color:var(--ask); background:var(--ask-wash); }
+  .note.warn .tag { color:var(--ask); }
+  ol.howto, ul.plain { max-width:var(--measure); margin:14px 0 18px; padding-left:1.4em; }
+  ol.howto li, ul.plain li { margin:0 0 8px; padding-left:4px; }
+  ol.howto li::marker { font-family:var(--mono); color:var(--accent-ink); font-weight:600; }
+  .legend { display:flex; flex-wrap:wrap; gap:10px 18px; margin:14px 0 0; font-size:14px; color:var(--slate); }
+  .legend b { font-family:var(--mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--accent-ink); margin-right:6px; }
 </style>
 
 <header class="topbar">
@@ -315,38 +358,54 @@
   <div class="toc-wrap">
     <nav class="toc" aria-label="Contents">
       <p class="toc-title">Field Guide</p>
-      <p class="grp">The surface</p>
+      <p class="grp">Start here</p>
       <ol>
-        <li><a href="#workspace">The default workspace</a></li>
-        <li><a href="#projects">Opening a project</a></li>
+        <li><a href="#install">Install and launch</a></li>
+        <li><a href="#accounts">Sign in and pick a model</a></li>
+        <li><a href="#projects">Open a project</a></li>
+        <li><a href="#first-task">Your first task</a></li>
+      </ol>
+      <p class="grp">The workspace</p>
+      <ol>
+        <li><a href="#workspace">The window</a></li>
+        <li><a href="#explorer">Files</a></li>
         <li><a href="#editor">The editor</a></li>
       </ol>
-      <p class="grp">The conversation</p>
+      <p class="grp">Working with the agent</p>
       <ol>
-        <li><a href="#intent">Intent, not modes</a></li>
-        <li><a href="#autonomy">Authority</a></li>
-        <li><a href="#context">Context &amp; skills</a></li>
+        <li><a href="#prompts">Prompts that work</a></li>
+        <li><a href="#autonomy">Autonomy</a></li>
+        <li><a href="#mentions">Attach context with @</a></li>
+        <li><a href="#skills">Skills with /</a></li>
+        <li><a href="#agents">AGENTS.md</a></li>
+        <li><a href="#conversations">Conversations</a></li>
       </ol>
-      <p class="grp">The work</p>
+      <p class="grp">Watching it work</p>
       <ol>
-        <li><a href="#tools">What it can do</a></li>
-        <li><a href="#permissions">Permissions</a></li>
-        <li><a href="#activity">Watching it work</a></li>
+        <li><a href="#activity">Activity and plans</a></li>
         <li><a href="#terminal">The terminal</a></li>
         <li><a href="#problems">Problems</a></li>
       </ol>
-      <p class="grp">The evidence</p>
+      <p class="grp">Review and undo</p>
       <ol>
-        <li><a href="#changes">Changes &amp; diffs</a></li>
-        <li><a href="#checkpoints">Checkpoints</a></li>
+        <li><a href="#completion">The completion card</a></li>
+        <li><a href="#changes">Reviewing changes</a></li>
+        <li><a href="#checkpoints">Checkpoints and undo</a></li>
         <li><a href="#git">Git</a></li>
-        <li><a href="#verify">Verified autonomy</a></li>
       </ol>
-      <p class="grp">Getting around</p>
+      <p class="grp">Rules and safety</p>
       <ol>
-        <li><a href="#palette">Palette &amp; keys</a></li>
-        <li><a href="#agents">AGENTS.md</a></li>
-        <li><a href="#accounts">Accounts &amp; models</a></li>
+        <li><a href="#permissions">Permission rules</a></li>
+        <li><a href="#safety">Hard limits and secrets</a></li>
+        <li><a href="#tools">Tool reference</a></li>
+      </ol>
+      <p class="grp">Reference</p>
+      <ol>
+        <li><a href="#palette">Command palette</a></li>
+        <li><a href="#keys">Keyboard shortcuts</a></li>
+        <li><a href="#storage">Where things are stored</a></li>
+        <li><a href="#troubleshooting">Troubleshooting</a></li>
+        <li><a href="#contributors">For contributors</a></li>
       </ol>
     </nav>
   </div>
@@ -355,26 +414,143 @@
     <div class="hero">
       <p class="eyebrow">Native macOS · Field Guide</p>
       <h1 class="title">A visual control surface for an <em>autonomous</em> software engineer.</h1>
-      <p class="lede">ROKUBI Harness gives ChatGPT a goal, then shows you the work: the files it reads, the commands it runs, the diffs it writes, and the evidence that it&rsquo;s done. This guide walks every surface, from the three&#8209;pane home to the completion card.</p>
+      <p class="lede">Give the agent a goal. It reads your code, edits files, runs commands, and shows you the evidence. This guide covers every feature, with examples you can copy and paste.</p>
       <dl class="atglance">
-        <div><dt>Default view</dt><dd>Files · Editor · ChatGPT</dd></div>
+        <div><dt>Default view</dt><dd>Files · Editor · Chat</dd></div>
         <div><dt>Everything else</dt><dd>Appears only when needed</dd></div>
-        <div><dt>Primary control</dt><dd>Authority, not modes</dd></div>
-        <div><dt>Every change</dt><dd>Reviewable &amp; reversible</dd></div>
+        <div><dt>Main control</dt><dd>Autonomy, not modes</dd></div>
+        <div><dt>Every change</dt><dd>Reviewable and undoable</dd></div>
       </dl>
+      <div class="legend">
+        <span><b>Terminal</b>paste into Terminal.app</span>
+        <span><b>Chat</b>paste into the chat box</span>
+        <span><b>File</b>save as the file named</span>
+      </div>
+      <p class="sub" style="margin-top:12px">Every example has a <strong>Copy</strong> button just above it, on the right.</p>
     </div>
 
-    <!-- ============ THE SURFACE ============ -->
-    <section id="workspace">
-      <div class="grouphead"><span class="gnum">i.</span><span class="glabel">The surface</span></div>
-      <h2>The default workspace</h2>
-      <p>Open a project and the window shows three things and nothing more: your <strong>files</strong> on the left, the <strong>editor</strong> in the middle, and <strong>ChatGPT</strong> on the right. That&rsquo;s the whole interface until a task needs more of it.</p>
+    <!-- ============ START HERE ============ -->
+    <section id="install">
+      <div class="grouphead"><span class="gnum">1.</span><span class="glabel">Start here</span></div>
+      <h2>Install and launch</h2>
+      <p>You need <strong>macOS 15 or later</strong>, <strong>Xcode 26</strong>, and <strong>Node.js with npm</strong>. The app is built and tested on Apple Silicon.</p>
+      <div class="snip">
+        <p class="where"><b>Terminal</b> check your tools</p>
+        <div class="codeblock">sw_vers -productVersion     <span class="c"># 15.0 or later</span>
+xcodebuild -version         <span class="c"># Xcode 26</span>
+node --version &amp;&amp; npm --version</div>
+      </div>
+      <div class="snip">
+        <p class="where"><b>Terminal</b> download, build, and open the app</p>
+        <div class="codeblock">git clone https://github.com/WilliamJones/rokubi-harness.git
+cd rokubi-harness
+scripts/bootstrap.sh        <span class="c"># once: installs XcodeGen and the editor's dependencies</span>
+scripts/run.sh              <span class="c"># builds a Debug copy and opens it</span></div>
+      </div>
+      <div class="snip">
+        <p class="where"><b>Terminal</b> install a Release copy in Applications</p>
+        <div class="codeblock">scripts/package.sh --install
+open /Applications/RokubiHarness.app</div>
+      </div>
+      <div class="note">
+        <span class="tag">Keychain prompt</span>
+        <p>Builds are signed locally, so macOS treats each new build as a new app. The first launch after a rebuild asks to use your saved keys. Click <strong>Always Allow</strong>.</p>
+      </div>
+    </section>
 
-      <div class="pane-mock" role="img" aria-label="Three-pane layout: Files, Editor, ChatGPT">
+    <section id="accounts">
+      <div class="grouphead"><span class="gnum">2.</span><span class="glabel">Start here</span></div>
+      <h2>Sign in and pick a model</h2>
+      <p>While you're signed out, a sign-in card replaces the chat box. Pick one of three ways to connect.</p>
+      <div class="tablewrap"><table class="ref">
+        <tr><th>Option</th><th>What you need</th><th>Models</th></tr>
+        <tr><td><strong>Sign in with ChatGPT</strong></td><td>A ChatGPT account. Your browser opens; finish signing in there and come back.</td><td>ChatGPT models</td></tr>
+        <tr><td><strong>Connect OpenRouter</strong></td><td>An OpenRouter key that starts with <code>sk-or-</code></td><td>Any model on OpenRouter</td></tr>
+        <tr><td><strong>Use an OpenAI API key instead</strong></td><td>An OpenAI key that starts with <code>sk-</code></td><td>OpenAI API models</td></tr>
+      </table></div>
+      <ol class="howto">
+        <li>Click <strong>Connect OpenRouter</strong> or <strong>Use an OpenAI API key instead</strong>.</li>
+        <li>Paste your key into the field and click <strong>Connect</strong> or <strong>Use</strong>.</li>
+        <li>Keys are stored in the macOS Keychain. They aren't checked when you paste them, so a wrong key shows up as an error on your first message.</li>
+      </ol>
+      <h3>Choose a model</h3>
+      <p>Click the model name in the middle of the toolbar. Type to search by name or id. Each row shows the context size and the price per million tokens. Click <strong>Refresh</strong> to reload the list.</p>
+      <p>Pick a model that can call tools. Search for <code>claude-sonnet</code> or <code>gpt-5</code>. Small free models often just chat and never run anything. If the list can't load, you get <code>gpt-5.4</code>, <code>gpt-5.4-mini</code>, <code>gpt-5.3-codex</code>, and <code>gpt-5.2</code>.</p>
+      <h3>Sign out</h3>
+      <p>Open the <strong>•••</strong> menu and choose <strong>Sign Out</strong>. This removes only the account you're using. If another key is still saved, the app may use it next time. To remove every saved key, quit the app and run this.</p>
+      <div class="snip">
+        <p class="where"><b>Terminal</b> remove all saved keys and tokens</p>
+        <div class="codeblock">security delete-generic-password -s com.rokubi.harness -a openai.apiKey
+security delete-generic-password -s com.rokubi.harness -a openrouter.apiKey
+security delete-generic-password -s com.rokubi.harness -a chatgpt.tokens</div>
+      </div>
+      <p class="sub">A "could not be found" message just means that key wasn't saved.</p>
+    </section>
+
+    <section id="projects">
+      <div class="grouphead"><span class="gnum">3.</span><span class="glabel">Start here</span></div>
+      <h2>Open a project</h2>
+      <p>A project is any normal folder. There's no import step.</p>
+      <ul class="plain">
+        <li><strong>Open Folder…</strong> in the welcome window, or press <kbd>⌘O</kbd> any time.</li>
+        <li>Drag a folder onto the welcome window.</li>
+        <li>Click a project under <strong>Recent</strong>. Right-click one to <strong>Remove from Recents</strong>. The list keeps the last 12.</li>
+        <li><strong>File › Open Recent</strong> lists the same projects, with <strong>Clear Menu</strong> at the bottom.</li>
+      </ul>
+      <p>Each project opens in its own window. The app keeps running after you close the last window.</p>
+      <div class="snip">
+        <p class="where"><b>Terminal</b> open a project, or a project and a file, from the command line</p>
+        <div class="codeblock">open -n /Applications/RokubiHarness.app --args --project ~/code/my-app
+open -n /Applications/RokubiHarness.app --args --project ~/code/my-app --open src/index.ts</div>
+      </div>
+      <div class="note warn">
+        <span class="tag">Known issue</span>
+        <p><strong>Open Folder…</strong> in the command palette only adds the folder to Recent. Use <kbd>⌘O</kbd> to open it.</p>
+      </div>
+    </section>
+
+    <section id="first-task">
+      <div class="grouphead"><span class="gnum">4.</span><span class="glabel">Start here</span></div>
+      <h2>Your first task, in five minutes</h2>
+      <p>The repository includes <code>demo-project</code>, a tiny shopping cart with one real bug and one failing test.</p>
+      <div class="snip">
+        <p class="where"><b>Terminal</b> see the failing test</p>
+        <div class="codeblock">cd rokubi-harness/demo-project
+npm test                    <span class="c"># 4 pass, 1 fail</span></div>
+      </div>
+      <ol class="howto">
+        <li>Press <kbd>⌘O</kbd> and choose the <code>demo-project</code> folder.</li>
+        <li>Pick a model that can call tools.</li>
+        <li>In the chat header, set <strong>Autonomy</strong> to <strong>Full Autonomy</strong> so it can run the tests without asking.</li>
+        <li>Paste this into the chat box and press <kbd>Return</kbd>.</li>
+      </ol>
+      <div class="snip">
+        <p class="where"><b>Chat</b></p>
+        <div class="codeblock prompt">Fix the failing test.</div>
+      </div>
+      <ol class="howto" start="5">
+        <li>Watch the plan, the terminal, the Problems chip, and the changes counter appear.</li>
+        <li>When the <strong>TASK COMPLETE</strong> card appears, click <strong>Review Changes</strong> to see the diff.</li>
+        <li>Click <strong>Undo Task</strong>. Then run the tests again and watch the failure come back.</li>
+      </ol>
+      <div class="snip">
+        <p class="where"><b>Terminal</b> confirm the undo, then reset the demo from the repository folder</p>
+        <div class="codeblock">npm test                    <span class="c"># fails again after Undo Task</span>
+cd .. &amp;&amp; git checkout -- demo-project</div>
+      </div>
+    </section>
+
+    <!-- ============ THE WORKSPACE ============ -->
+    <section id="workspace">
+      <div class="grouphead"><span class="gnum">5.</span><span class="glabel">The workspace</span></div>
+      <h2>The window</h2>
+      <p>A project window shows three panes: <strong>files</strong> on the left, the <strong>editor</strong> in the middle, and the <strong>chat</strong> on the right.</p>
+
+      <div class="pane-mock" role="img" aria-label="Three-pane layout: Files, Editor, Chat">
         <div class="pane-titlebar">
           <span class="dot" style="background:#ec6a5e"></span><span class="dot" style="background:#f4bf4f"></span><span class="dot" style="background:#61c554"></span>
-          <span style="margin-left:8px">my-project</span>
-          <span style="margin-left:auto">GPT-5 ▾</span><span>•••</span>
+          <span style="margin-left:8px">my-project — src/auth.ts</span>
+          <span style="margin-left:auto">GPT-5.4 ⇅</span><span>•••</span>
         </div>
         <div class="panes">
           <div class="p-files">
@@ -391,269 +567,669 @@
             <div class="codeline">) { … }</div>
           </div>
           <div class="p-chat">
-            <p class="pane-label">ChatGPT</p>
+            <p class="pane-label">Chat · Autonomy: Standard</p>
             <div class="chatbubble">Add dark mode using the existing design system, and make the tests pass.</div>
           </div>
         </div>
       </div>
 
-      <p class="sub">Terminal output, plans, diffs, problems, and Git actions all exist &mdash; they just stay out of the way and surface contextually, then recede when the task is done. A capability has to earn permanent space through frequency and necessity.</p>
+      <dl class="pairs">
+        <dt>Title</dt><dd>The project name, with the open file's path underneath.</dd>
+        <dt>Model name</dt><dd>Click to search and switch models.</dd>
+        <dt>••• menu</dt><dd>Your account, <strong>Sign Out</strong> or <strong>Sign in with ChatGPT…</strong>, <strong>New Terminal</strong>, <strong>Reveal Project in Finder</strong>, and <strong>Reload File Tree</strong>.</dd>
+      </dl>
+      <p>Everything else appears only when a task needs it: the terminal drawer, the Problems chip, the plan, the changes counter, approval requests, and the completion card. There's no Settings window. Settings live in menus and in project files.</p>
     </section>
 
-    <section id="projects">
-      <div class="grouphead"><span class="gnum">ii.</span><span class="glabel">The surface</span></div>
-      <h2>Opening a project</h2>
-      <p>From the welcome window, <strong>Open Folder</strong> (<kbd>⌘O</kbd>), pick a recent project, or drag a folder onto the window. The harness works directly on a normal local folder &mdash; there&rsquo;s no import step and no proprietary project format.</p>
-      <dl class="pairs">
-        <dt>File tree</dt><dd>Hierarchical, lazy&#8209;loaded, and <code>.gitignore</code>&#8209;aware &mdash; build output and dependencies stay hidden.</dd>
-        <dt>Live updates</dt><dd>A filesystem watcher keeps the tree and open files current. Edit by hand any time &mdash; the agent&rsquo;s tools read files from disk on every call, so its next edit builds on what you saved.</dd>
-        <dt>File actions</dt><dd>Create, rename, move, duplicate, delete, and drag&#8209;and&#8209;drop, all from the Explorer&rsquo;s context menu.</dd>
-      </dl>
+    <section id="explorer">
+      <div class="grouphead"><span class="gnum">6.</span><span class="glabel">The workspace</span></div>
+      <h2>Files</h2>
+      <p>Click a file to open it. Click the arrow next to a folder to expand it. Folders sort first.</p>
+      <div class="tablewrap"><table class="ref">
+        <tr><th>Right-click on</th><th>Menu items</th></tr>
+        <tr><td>Empty space</td><td>New File…, New Folder…, Reveal in Finder</td></tr>
+        <tr><td>A folder</td><td>New File…, New Folder…, Rename…, Duplicate, Reveal in Finder, Copy Path, Move to Trash</td></tr>
+        <tr><td>A file</td><td>Open, Rename…, Duplicate, Reveal in Finder, Copy Path, Move to Trash</td></tr>
+      </table></div>
+      <ul class="plain">
+        <li><strong>Move:</strong> drag an item onto a folder, or onto empty space to move it to the project root. Dragging in from Finder isn't supported.</li>
+        <li><strong>Duplicate</strong> names the copy <code>name copy.ext</code>, then <code>name copy 2.ext</code>.</li>
+        <li><strong>Copy Path</strong> copies the path relative to the project, ready to paste after <code>@</code> in the chat.</li>
+        <li><strong>Move to Trash</strong> asks first, and closes any open tabs inside it.</li>
+        <li><strong>Hidden:</strong> <code>.git</code>, <code>.DS_Store</code>, and anything your root <code>.gitignore</code> lists. Other dotfiles are shown.</li>
+      </ul>
     </section>
 
     <section id="editor">
-      <div class="grouphead"><span class="gnum">iii.</span><span class="glabel">The surface</span></div>
+      <div class="grouphead"><span class="gnum">7.</span><span class="glabel">The workspace</span></div>
       <h2>The editor</h2>
-      <p>A full code editor (Monaco) sits at the centre &mdash; the same engine as VS Code. It&rsquo;s a real editing surface, not a read&#8209;only preview: everything the agent writes, you can refine by hand.</p>
-      <div class="cols two">
-        <div>
-          <h3>Editing</h3>
-          <p class="sub">Syntax highlighting, tabs, code folding, bracket matching, multiple cursors, autocomplete, and formatting.</p>
-        </div>
-        <div>
-          <h3>Commands</h3>
-          <p class="sub">Find &amp; replace (<kbd>⌘F</kbd>), format document, toggle comment (<kbd>⌘/</kbd>), go to line (<kbd>⌘L</kbd>), and save (<kbd>⌘S</kbd>).</p>
-        </div>
+      <p>The editor is Monaco, the engine inside VS Code. Everything the agent writes, you can edit by hand.</p>
+      <ul class="plain">
+        <li><strong>Tabs:</strong> a dot (●) means unsaved changes. Hover a tab to see its close button.</li>
+        <li><strong>Saving:</strong> there's no autosave. Press <kbd>⌘S</kbd>, or <kbd>⌥⌘S</kbd> to save everything.</li>
+        <li><strong>Languages:</strong> picked from the file extension. TypeScript, JavaScript, JSON, CSS, SCSS, Less, and HTML get full autocomplete and error checking. Other languages get syntax colouring.</li>
+        <li><strong>Multiple cursors:</strong> hold <kbd>⌥</kbd> and click.</li>
+        <li><strong>Every Monaco command:</strong> press <kbd>⇧⌘P</kbd> inside the editor.</li>
+      </ul>
+      <div class="note warn">
+        <span class="tag">Save before closing</span>
+        <p>Closing a tab doesn't ask to save. Unsaved edits in that tab are lost. Press <kbd>⌘S</kbd> first.</p>
       </div>
-      <div class="note">
-        <span class="tag">Human first</span>
-        <p>If a file changes on disk while you have unsaved edits, the editor tells you and lets you <strong>Reload</strong> or <strong>Keep Mine</strong> &mdash; your work is never silently overwritten.</p>
-      </div>
+      <div class="tablewrap"><table class="ref">
+        <tr><th>Keys</th><th>Editor menu command</th></tr>
+        <tr><td><kbd>⌘F</kbd></td><td>Find…</td></tr>
+        <tr><td><kbd>⌥⌘F</kbd></td><td>Find and Replace…</td></tr>
+        <tr><td><kbd>⌘L</kbd></td><td>Go to Line…</td></tr>
+        <tr><td><kbd>⌥⇧⌘F</kbd></td><td>Format Document</td></tr>
+        <tr><td><kbd>⌘/</kbd></td><td>Toggle Line Comment</td></tr>
+        <tr><td><kbd>⇧⌘P</kbd></td><td>Command Palette (Editor)</td></tr>
+        <tr><td><kbd>⌘W</kbd></td><td>Close Editor</td></tr>
+      </table></div>
+      <h3>When a file changes on disk</h3>
+      <p>If the agent or another app changes a file you haven't edited, the tab reloads on its own. If you have unsaved edits, a banner appears with two buttons.</p>
+      <dl class="pairs">
+        <dt>Reload</dt><dd>Throw away your edits and load the file from disk.</dd>
+        <dt>Keep Mine</dt><dd>Hide the banner and keep your edits. Your next save overwrites the version on disk.</dd>
+      </dl>
     </section>
 
-    <!-- ============ THE CONVERSATION ============ -->
-    <section id="intent">
-      <div class="grouphead"><span class="gnum">iv.</span><span class="glabel">The conversation</span></div>
-      <h2>Intent comes from the conversation</h2>
-      <p>There are no Ask / Plan / Edit / Agent buttons to choose between. You just say what you want, and the harness reads your intent from the words:</p>
-      <dl class="pairs">
-        <dt>&ldquo;Explain&hellip;&rdquo;</dt><dd>It reads the relevant files and explains.</dd>
-        <dt>&ldquo;Plan how&hellip;&rdquo;</dt><dd>It investigates and produces a short plan.</dd>
-        <dt>&ldquo;Do it.&rdquo;</dt><dd>It edits.</dd>
-        <dt>&ldquo;Fix the tests, keep going until they pass.&rdquo;</dt><dd>It edits, runs, diagnoses, fixes, and verifies.</dd>
-      </dl>
-      <p>Conversations belong to the project and persist between sessions. Start a fresh one or reopen an earlier thread from the conversation menu at the top of the chat panel.</p>
+    <!-- ============ WORKING WITH THE AGENT ============ -->
+    <section id="prompts">
+      <div class="grouphead"><span class="gnum">8.</span><span class="glabel">Working with the agent</span></div>
+      <h2>Prompts that work</h2>
+      <p>There are no Ask, Plan, or Edit modes. The words you use decide what happens. Good prompts say what you want and how to check it. Press <kbd>Return</kbd> to send and <kbd>⌘.</kbd> to stop.</p>
+
+      <h3>Understand the code</h3>
+      <div class="snip"><p class="where"><b>Chat</b></p><div class="codeblock prompt">Explain how this project is structured. Start with the entry point and name the main modules.</div></div>
+      <div class="snip"><p class="where"><b>Chat</b></p><div class="codeblock prompt">Explain what @src/cart.js does, then list anything that looks risky.</div></div>
+
+      <h3>Plan first, then build</h3>
+      <div class="snip"><p class="where"><b>Chat</b> step one</p><div class="codeblock prompt">Plan how to add dark mode using the existing design tokens. Don't edit anything yet.</div></div>
+      <div class="snip"><p class="where"><b>Chat</b> step two, after you've read the plan</p><div class="codeblock prompt">Do it. Run the tests when you're done.</div></div>
+
+      <h3>Build a feature</h3>
+      <div class="snip"><p class="where"><b>Chat</b></p><div class="codeblock prompt">Add a --json flag to the CLI that prints the results as JSON. Add tests for it and run the whole test suite.</div></div>
+
+      <h3>Fix things</h3>
+      <div class="snip"><p class="where"><b>Chat</b></p><div class="codeblock prompt">Run npm test, fix every failure, and keep going until all the tests pass.</div></div>
+      <div class="snip"><p class="where"><b>Chat</b></p><div class="codeblock prompt">This command failed. Find out why and fix it: @terminal</div></div>
+
+      <h3>Refactor and review</h3>
+      <div class="snip"><p class="where"><b>Chat</b></p><div class="codeblock prompt">Refactor @selection into smaller functions without changing behaviour. Run the tests before and after.</div></div>
+      <div class="snip"><p class="where"><b>Chat</b></p><div class="codeblock prompt">Review @changes for bugs, missing tests, and risky edge cases. Don't edit anything.</div></div>
+
+      <h3>Ask for honest verification</h3>
+      <div class="snip"><p class="where"><b>Chat</b></p><div class="codeblock prompt">Build, lint, and test. In your completion report, mark any check you couldn't run as not run.</div></div>
     </section>
 
     <section id="autonomy">
-      <div class="grouphead"><span class="gnum">v.</span><span class="glabel">The conversation</span></div>
-      <h2>The one dial that matters: authority</h2>
-      <p>Instead of behavioural modes, the harness has a single persistent control &mdash; how much authority you grant the agent. Set it from <code>Autonomy&nbsp;▾</code> in the chat header.</p>
-      <div class="ladder">
-        <div class="rung"><span class="badge b-read">READ ONLY</span><div><h4>Read Only</h4><p>Can inspect, search, and read Git status &mdash; but cannot modify anything.</p></div></div>
-        <div class="rung"><span class="badge b-std">STANDARD</span><div><h4>Standard</h4><p>Reads, searches, and edits freely. Destructive or external actions ask first.</p></div></div>
-        <div class="rung"><span class="badge b-ask">ASK CMDS</span><div><h4>Ask Before Commands</h4><p>File edits proceed on their own; running terminal commands needs your approval.</p></div></div>
-        <div class="rung"><span class="badge b-full">FULL</span><div><h4>Full Autonomy</h4><p>Runs edit → test → fix → verify without stopping &mdash; still inside hard security limits.</p></div></div>
-      </div>
-      <p class="sub">Whatever the setting, a small set of dangerous actions is always blocked (see <a href="#permissions">Permissions</a>).</p>
-    </section>
-
-    <section id="context">
-      <div class="grouphead"><span class="gnum">vi.</span><span class="glabel">The conversation</span></div>
-      <h2>Point at things with <code>@</code>, run workflows with <code>/</code></h2>
-      <h3>Attach context with @</h3>
-      <p>Type <code>@</code> in the composer to hand the agent exactly what it needs &mdash; nothing more loads by default, keeping the context small and the work fast.</p>
+      <div class="grouphead"><span class="gnum">9.</span><span class="glabel">Working with the agent</span></div>
+      <h2>Autonomy: how much the agent may do</h2>
+      <p>Set it from <strong>Autonomy ▾</strong> in the chat header. It starts at <strong>Standard</strong> and is remembered for every project.</p>
+      <div class="tablewrap"><table class="ref">
+        <tr><th>Action</th><th>Read Only</th><th>Standard</th><th>Ask Before Commands</th><th>Full Autonomy</th></tr>
+        <tr><td>Read files, search, git status / diff / log</td><td><span class="d allow">allow</span></td><td><span class="d allow">allow</span></td><td><span class="d allow">allow</span></td><td><span class="d allow">allow</span></td></tr>
+        <tr><td>Edit and create files</td><td><span class="d deny">deny</span></td><td><span class="d allow">allow</span></td><td><span class="d allow">allow</span></td><td><span class="d allow">allow</span></td></tr>
+        <tr><td>Delete files (moves them to the Trash)</td><td><span class="d deny">deny</span></td><td><span class="d ask">ask</span></td><td><span class="d allow">allow</span></td><td><span class="d allow">allow</span></td></tr>
+        <tr><td>Run terminal commands</td><td><span class="d deny">deny</span></td><td><span class="d ask">ask</span></td><td><span class="d ask">ask</span></td><td><span class="d allow">allow</span></td></tr>
+      </table></div>
+      <div class="tablewrap"><table class="ref">
+        <tr><th>Choose</th><th>When</th></tr>
+        <tr><td>Read Only</td><td>You're exploring code you don't know yet.</td></tr>
+        <tr><td>Standard</td><td>Everyday work. You approve deletes and commands.</td></tr>
+        <tr><td>Ask Before Commands</td><td>Let it edit freely, but see every command before it runs.</td></tr>
+        <tr><td>Full Autonomy</td><td>Trusted projects, and "keep going until the tests pass" tasks.</td></tr>
+      </table></div>
+      <h3>Answering an approval request</h3>
+      <p>When an action needs approval, a card appears in the chat: <em>"&lt;agent&gt; wants to &lt;action&gt;"</em>, with the exact command or path underneath.</p>
       <dl class="pairs">
-        <dt>@path/to/file</dt><dd>A file or folder&rsquo;s contents.</dd>
-        <dt>@selection</dt><dd>Whatever is highlighted in the editor.</dd>
-        <dt>@terminal</dt><dd>Recent terminal output.</dd>
-        <dt>@problems</dt><dd>The current diagnostics.</dd>
-        <dt>@changes</dt><dd>Files changed in this task.</dd>
+        <dt>Allow <kbd>Return</kbd></dt><dd>Run this one action.</dd>
+        <dt>Always Allow</dt><dd>Allow similar actions until this task finishes. For commands it remembers the first word: approving <code>npm test</code> allows any <code>npm …</code> command. A command that starts with a path, like <code>./scripts/test.sh</code>, is remembered exactly.</dd>
+        <dt>Deny <kbd>Esc</kbd></dt><dd>Block it. The agent is told and tries another way.</dd>
       </dl>
-      <h3>Skills with /</h3>
-      <p>A <strong>skill</strong> is just a Markdown file in <code>.rokubi/skills/</code> (or <code>~/.rokubi/skills/</code>). Type <code>/</code> to run one &mdash; its instructions are prepended to your message. Skills are how you add higher&#8209;level workflows like <code>/review</code> or <code>/deploy</code> without cluttering the interface.</p>
+      <p class="sub">"Always" resets with your next message. To allow something for good, add a rule to <a href="#permissions">.rokubi/permissions.json</a>. A few dangerous commands are blocked at every level; see <a href="#safety">Hard limits</a>.</p>
     </section>
 
-    <!-- ============ THE WORK ============ -->
-    <section id="tools">
-      <div class="grouphead"><span class="gnum">vii.</span><span class="glabel">The work</span></div>
-      <h2>What the agent can actually do</h2>
-      <p>Every action goes through a structured tool &mdash; the model never gets raw access to your machine. The tools compose a few primitives: <strong>read, search, edit, create, delete, run</strong>.</p>
-      <div class="tools">
-        <div class="tool"><code>read_file</code><span>Read a file, by line range</span></div>
-        <div class="tool"><code>list_dir</code><span>List a directory</span></div>
-        <div class="tool"><code>glob</code><span>Find files by name pattern</span></div>
-        <div class="tool"><code>grep</code><span>Search file contents (regex)</span></div>
-        <div class="tool"><code>apply_patch</code><span>Precise search/replace edits</span></div>
-        <div class="tool"><code>write_file</code><span>Replace a whole file</span></div>
-        <div class="tool"><code>create_file</code><span>Make a new file</span></div>
-        <div class="tool"><code>rename_path</code><span>Move or rename</span></div>
-        <div class="tool"><code>delete_path</code><span>Move to Trash</span></div>
-        <div class="tool"><code>run_command</code><span>Run a shell command</span></div>
-        <div class="tool"><code>git_status / diff / log</code><span>Inspect the repository</span></div>
-        <div class="tool"><code>update_plan</code><span>Show a step checklist</span></div>
-        <div class="tool"><code>report_completion</code><span>Close out with evidence</span></div>
+    <section id="mentions">
+      <div class="grouphead"><span class="gnum">10.</span><span class="glabel">Working with the agent</span></div>
+      <h2>Attach context with <code>@</code></h2>
+      <p>Type <code>@</code> in the chat box to see suggestions. Press <kbd>Tab</kbd> to accept the first one. Attached items show as small chips under your message.</p>
+      <div class="tablewrap"><table class="ref">
+        <tr><th>Type</th><th>Attaches</th></tr>
+        <tr><td><code>@selection</code></td><td>The text selected in the editor. Nothing if no text is selected.</td></tr>
+        <tr><td><code>@terminal</code></td><td>The last 120 lines of the terminal tab you're looking at.</td></tr>
+        <tr><td><code>@problems</code></td><td>Every entry in the Problems list.</td></tr>
+        <tr><td><code>@changes</code></td><td>The list of files changed in the current task.</td></tr>
+        <tr><td><code>@src/</code></td><td>What's inside that folder, one level deep.</td></tr>
+        <tr><td><code>@src/cart.js</code></td><td>The whole file, up to 40,000 characters. Secret files are skipped.</td></tr>
+      </table></div>
+      <p>Paths are relative to the project folder and must match exactly, so use the suggestions. A mention that matches nothing is ignored without a warning.</p>
+      <div class="snip"><p class="where"><b>Chat</b></p><div class="codeblock prompt">Explain @src/cart.js line by line.</div></div>
+      <div class="snip"><p class="where"><b>Chat</b></p><div class="codeblock prompt">Write unit tests for @selection and run them.</div></div>
+      <div class="snip"><p class="where"><b>Chat</b></p><div class="codeblock prompt">Why did this fail? @terminal</div></div>
+      <div class="snip"><p class="where"><b>Chat</b></p><div class="codeblock prompt">Summarize @changes as a pull request description.</div></div>
+      <div class="snip"><p class="where"><b>Chat</b></p><div class="codeblock prompt">What's in @src/ and which file should I read first?</div></div>
+      <p class="sub">You don't need <code>@</code> for the basics. Every message already includes your root <code>AGENTS.md</code>, a map of the project, the name of the open file, and the selected code.</p>
+    </section>
+
+    <section id="skills">
+      <div class="grouphead"><span class="gnum">11.</span><span class="glabel">Working with the agent</span></div>
+      <h2>Skills: reusable prompts with <code>/</code></h2>
+      <p>A skill is a saved prompt. Type <code>/</code> at the very start of a message to see them, then <kbd>Tab</kbd> to pick one. You can also choose one in the command palette. Anything you type after the skill name is added to its instructions.</p>
+      <h3>Built-in skills</h3>
+      <div class="tablewrap"><table class="ref">
+        <tr><th>Skill</th><th>What it does</th></tr>
+        <tr><td><code>/review</code></td><td>Review the current changes for bugs and risks</td></tr>
+        <tr><td><code>/test</code></td><td>Run the project's tests and fix failures</td></tr>
+        <tr><td><code>/refactor</code></td><td>Refactor the selected code or named module without changing behaviour</td></tr>
+        <tr><td><code>/explain</code></td><td>Explain how part of the project works</td></tr>
+        <tr><td><code>/security-review</code></td><td>Audit the changes or project for security issues</td></tr>
+      </table></div>
+      <div class="snip"><p class="where"><b>Chat</b></p><div class="codeblock prompt">/explain how checkout calculates the total</div></div>
+      <div class="snip"><p class="where"><b>Chat</b></p><div class="codeblock prompt">/security-review @changes</div></div>
+
+      <h3>Make your own</h3>
+      <ul class="plain">
+        <li>A skill is a Markdown file. The file name, without <code>.md</code>, is the skill name, so use no spaces.</li>
+        <li>The first line, without the <code>#</code>, is the description shown in suggestions.</li>
+        <li>The whole file is sent, then a <code>---</code> line, then whatever you typed after the name. Don't add YAML front matter; it's sent as plain text.</li>
+        <li>Put team skills in <code>.rokubi/skills/</code> inside the project. Put personal skills in <code>~/.rokubi/skills/</code>. Project skills win over personal ones, and both win over built-ins with the same name.</li>
+        <li>New skills appear within a couple of seconds, or as soon as you open the command palette.</li>
+      </ul>
+      <div class="snip">
+        <p class="where"><b>Terminal</b> run in your project folder: a team skill</p>
+        <div class="codeblock">mkdir -p .rokubi/skills
+cat &gt; .rokubi/skills/changelog.md &lt;&lt;'EOF'
+# Draft a changelog entry for the current changes
+Run git_diff and git_log (limit 10). Write an entry under "## Unreleased" in CHANGELOG.md,
+grouped as Added / Changed / Fixed, one line per change, in user-facing words.
+Only edit CHANGELOG.md. Finish with report_completion.
+EOF</div>
       </div>
-      <div class="note">
-        <span class="tag">Secrets are off&#8209;limits</span>
-        <p>The agent can never read files like <code>.env</code>, <code>*.pem</code>, <code>*.key</code>, or <code>credentials.json</code>, and every path is checked to stay inside the project root &mdash; symlinks included. It can&rsquo;t rename or delete a secret file to get around that either.</p>
+      <div class="snip"><p class="where"><b>Chat</b></p><div class="codeblock prompt">/changelog</div></div>
+      <div class="snip">
+        <p class="where"><b>Terminal</b> a personal skill for every project</p>
+        <div class="codeblock">mkdir -p ~/.rokubi/skills
+cat &gt; ~/.rokubi/skills/add-tests.md &lt;&lt;'EOF'
+# Add unit tests for the file I name
+Read the file I name and the existing tests next to it, and match their style.
+Add focused tests for untested branches and edge cases.
+Run the test command until it passes. Do not change production code.
+Finish with report_completion.
+EOF</div>
       </div>
-    </section>
-
-    <section id="permissions">
-      <div class="grouphead"><span class="gnum">viii.</span><span class="glabel">The work</span></div>
-      <h2>Permissions, only when needed</h2>
-      <p>Each tool falls into a permission class, and your autonomy preset (plus any custom rules) decides whether it&rsquo;s allowed, asks first, or is denied. Approvals appear <strong>inline in the chat</strong> &mdash; never a modal that stops everything.</p>
-      <div class="permgrid">
-        <div class="permcol allow"><header>Allow</header><ul><li>read files</li><li>search</li><li>git status</li><li>npm test</li></ul></div>
-        <div class="permcol ask"><header>Ask</header><ul><li>install packages</li><li>delete files</li><li>git commit</li><li>network access</li></ul></div>
-        <div class="permcol deny"><header>Deny</header><ul><li>force push</li><li>rm -rf /</li><li>sudo</li><li>disk writes</li></ul></div>
-      </div>
-      <p>When the agent asks, you can <strong>Allow</strong> once, <strong>Always Allow</strong> that kind of command for the session, or <strong>Deny</strong>. Project&#8209;level rules live in <code>.rokubi/permissions.json</code>; the deny list of genuinely dangerous commands holds regardless of autonomy.</p>
-    </section>
-
-    <section id="activity">
-      <div class="grouphead"><span class="gnum">ix.</span><span class="glabel">The work</span></div>
-      <h2>Watching it work</h2>
-      <p>Instead of a wall of narration, the agent&rsquo;s actions appear as compact, collapsible activity rows inline in the conversation. You see what happened; you expand only what you want the detail on.</p>
-      <div class="activity" role="img" aria-label="Example agent activity log">
-        <div class="ar"><span class="ok">✓</span> Searched project for &ldquo;theme&rdquo;</div>
-        <div class="ar"><span class="ok">✓</span> Read 5 files</div>
-        <div class="ar"><span class="ok">✓</span> Edited src/theme.ts</div>
-        <div class="ar"><span class="run">▸</span> Ran <span style="color:var(--ink)">npm test</span> &mdash; 48 passed</div>
-      </div>
-      <p class="sub">For multi&#8209;step work the agent can post an <strong>Implementation Plan</strong> that ticks off as it goes. Simple tasks get no plan at all &mdash; planning is a contextual artifact, not a permanent panel.</p>
-    </section>
-
-    <section id="terminal">
-      <div class="grouphead"><span class="gnum">x.</span><span class="glabel">The work</span></div>
-      <h2>The terminal</h2>
-      <p>Hidden until something runs, the terminal drawer opens under the editor the first time you &mdash; or the agent &mdash; run a command. It&rsquo;s a real PTY running your login shell, so <code>PATH</code>, <code>nvm</code>, and everything else behave exactly as in Terminal.app.</p>
-      <dl class="pairs">
-        <dt>Who ran it</dt><dd>Commands the agent runs carry a <span style="color:var(--accent-ink)">⚡</span> badge; yours don&rsquo;t. Open your own shells with <kbd>⌃`</kbd>.</dd>
-        <dt>Jump to code</dt><dd>Any <code>path:line</code> in the output is clickable &mdash; it opens that spot in the editor.</dd>
-        <dt>Agent&#8209;readable</dt><dd>Output is captured (ANSI stripped) so the agent can read results and keep going.</dd>
-      </dl>
-    </section>
-
-    <section id="problems">
-      <div class="grouphead"><span class="gnum">xi.</span><span class="glabel">The work</span></div>
-      <h2>Problems</h2>
-      <p>When a build, type&#8209;check, lint, or test run reports errors, a <strong>⚠ Problems</strong> chip appears beneath the editor. The harness parses output from <code>tsc</code>, <code>eslint</code>, <code>swiftc</code>, <code>cargo</code>, <code>pytest</code>, <code>jest/vitest</code>, and Node&rsquo;s built&#8209;in test runner into a real list.</p>
-      <p>Each problem opens its exact location in the editor (with an inline marker), and any problem &mdash; or the whole list &mdash; can be handed straight to the agent with <strong>Fix with AI</strong>.</p>
-    </section>
-
-    <!-- ============ THE EVIDENCE ============ -->
-    <section id="changes">
-      <div class="grouphead"><span class="gnum">xii.</span><span class="glabel">The evidence</span></div>
-      <h2>Changes &amp; visual diffs</h2>
-      <p>After the agent edits files, a <code>4 files changed&nbsp;&nbsp;Review</code> chip appears. <strong>Review</strong> opens a focused side&#8209;by&#8209;side diff &mdash; the file&rsquo;s state when the task began on the left, the current version on the right.</p>
-      <dl class="pairs">
-        <dt>Accept</dt><dd>Keep a file&rsquo;s changes, or accept all.</dd>
-        <dt>Reject</dt><dd>Revert a file to its pre&#8209;task state, or reject all.</dd>
-        <dt>Revert</dt><dd>Undo a single change inside a file from the list under the diff, keeping the rest.</dd>
-        <dt>Edit</dt><dd>Type in the right&#8209;hand pane to tweak the result by hand &mdash; your edits are saved to disk as you go.</dd>
-      </dl>
-    </section>
-
-    <section id="checkpoints">
-      <div class="grouphead"><span class="gnum">xiii.</span><span class="glabel">The evidence</span></div>
-      <h2>Checkpoints &amp; undo</h2>
-      <p>Before every mutating action, the harness snapshots the file. That makes the whole task reversible &mdash; independently of Git, so it works even in a folder that isn&rsquo;t a repository.</p>
-      <dl class="pairs">
-        <dt>Undo Task</dt><dd>Restore every file the task touched to how it started.</dd>
-        <dt>Revert file</dt><dd>Roll back a single file from the diff view.</dd>
-        <dt>Revert change</dt><dd>Roll back one change inside a file, from the diff view.</dd>
-      </dl>
-    </section>
-
-    <section id="git">
-      <div class="grouphead"><span class="gnum">xiv.</span><span class="glabel">The evidence</span></div>
-      <h2>Git, when it&rsquo;s relevant</h2>
-      <p>Git is a first&#8209;class capability but not a permanent sidebar. The agent can read <code>status</code>, <code>diff</code>, and <code>log</code>, and once you&rsquo;re happy with a task, <strong>Commit</strong> stages and commits it straight from the completion card. Committing stays a human decision.</p>
-    </section>
-
-    <section id="verify">
-      <div class="grouphead"><span class="gnum">xv.</span><span class="glabel">The evidence</span></div>
-      <h2>Autonomy that ends in evidence</h2>
-      <p>For implementation work the agent runs a loop, not a single shot &mdash; and it doesn&rsquo;t just claim success, it shows it.</p>
-      <div class="loop" role="img" aria-label="Verification loop">
-        <span class="step">edit</span><span class="arr">→</span>
-        <span class="step">build / lint</span><span class="arr">→</span>
-        <span class="step">test</span><span class="arr">→</span>
-        <span class="step">inspect failure</span><span class="arr">→</span>
-        <span class="step">fix</span><span class="arr">→</span>
-        <span class="step key">verify</span>
-      </div>
-      <p>Every meaningful completion answers three questions &mdash; <strong>what changed, what was verified, and can I undo it</strong> &mdash; in a single card:</p>
-      <div class="completion" role="img" aria-label="Example TASK COMPLETE card">
-        <p class="cc-tag">TASK COMPLETE</p>
-        <p class="cc-sum">Dark mode implemented using the existing design tokens.</p>
-        <div class="cc-cols">
-          <div>
-            <h5>Changes</h5>
-            <div class="row">4 files changed</div>
-          </div>
-          <div>
-            <h5>Verified</h5>
-            <div class="row"><svg class="tick" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.2 3.2L13 5" stroke="var(--allow)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>TypeScript</div>
-            <div class="row"><svg class="tick" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.2 3.2L13 5" stroke="var(--allow)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Lint</div>
-            <div class="row"><svg class="tick" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.2 3.2L13 5" stroke="var(--allow)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>14 tests passed</div>
-            <div class="row"><svg class="tick" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.2 3.2L13 5" stroke="var(--allow)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Production build</div>
-          </div>
-        </div>
-        <div class="cc-actions">
-          <button class="btn primary">Review Changes</button>
-          <button class="btn">Commit</button>
-          <button class="btn danger">Undo Task</button>
-        </div>
-      </div>
-      <p class="sub">The card is honest about its reach: it distinguishes what was <em>implemented</em>, <em>compiled</em>, <em>linted</em>, and <em>tested</em> from what was <em>not verified</em> &mdash; it never claims a check it didn&rsquo;t run.</p>
-    </section>
-
-    <!-- ============ GETTING AROUND ============ -->
-    <section id="palette">
-      <div class="grouphead"><span class="gnum">xvi.</span><span class="glabel">Getting around</span></div>
-      <h2>The command palette &amp; keys</h2>
-      <p>Press <kbd>⌘K</kbd> for the universal escape hatch &mdash; the home for everything that doesn&rsquo;t deserve a permanent button. Fuzzy&#8209;search to open a project, review changes, open a terminal, format or search the current file, start a new conversation, change the model, run a skill, undo a task, or commit.</p>
-      <dl class="pairs">
-        <dt>⌘K</dt><dd>Command palette</dd>
-        <dt>⌘O</dt><dd>Open folder</dd>
-        <dt>⌘S / ⌥⌘S</dt><dd>Save / Save all</dd>
-        <dt>⌘F</dt><dd>Find in file</dd>
-        <dt>⌃`</dt><dd>New terminal</dd>
-        <dt>⌘↩</dt><dd>Send to ChatGPT</dd>
-        <dt>⌘.</dt><dd>Stop the agent</dd>
-      </dl>
+      <div class="snip"><p class="where"><b>Chat</b></p><div class="codeblock prompt">/add-tests src/cart.js</div></div>
+      <p class="sub">That last message sends the skill's text, a <code>---</code> line, and then <code>src/cart.js</code>. A <code>/name</code> that matches no skill is sent as ordinary text.</p>
     </section>
 
     <section id="agents">
-      <div class="grouphead"><span class="gnum">xvii.</span><span class="glabel">Getting around</span></div>
-      <h2>Project memory: <code>AGENTS.md</code></h2>
-      <p>Drop an <code>AGENTS.md</code> in your project root and the harness always loads it as context &mdash; architecture notes, conventions, preferred libraries, forbidden patterns, the commands to build and test. It&rsquo;s the &ldquo;files before subsystems&rdquo; principle in practice: a plain file, not a settings screen.</p>
+      <div class="grouphead"><span class="gnum">12.</span><span class="glabel">Working with the agent</span></div>
+      <h2>AGENTS.md: instructions for every message</h2>
+      <p>Put an <code>AGENTS.md</code> file in the project root, and the agent reads it on every message. Only the root file is used, and only its first 12,000 characters. List the exact build and test commands, so the agent verifies its work the way you do.</p>
+      <div class="snip">
+        <p class="where"><b>Terminal</b> run in your project folder, then edit to match your project</p>
+        <div class="codeblock">cat &gt; AGENTS.md &lt;&lt;'EOF'
+# Project instructions
+
+## Commands
+- Install: `npm ci`
+- Test: `npm test`
+- Lint: `npm run lint`
+- Type-check: `npx tsc --noEmit`
+
+## Conventions
+- TypeScript strict mode. No `any`.
+- One component per file in `src/components/`.
+- Money is stored as integer cents.
+
+## Don't
+- Don't edit generated files in `src/generated/`.
+- Don't add dependencies without asking.
+EOF</div>
+      </div>
+      <p class="sub">Pair this with <a href="#permissions">permission rules</a> that allow those same commands, and the agent can verify without stopping to ask.</p>
     </section>
 
-    <section id="accounts" style="border-bottom:0;">
-      <div class="grouphead"><span class="gnum">xviii.</span><span class="glabel">Getting around</span></div>
-      <h2>Accounts &amp; models</h2>
-      <p>Sign in three ways, all behind the same interface:</p>
+    <section id="conversations">
+      <div class="grouphead"><span class="gnum">13.</span><span class="glabel">Working with the agent</span></div>
+      <h2>Conversations</h2>
+      <p>Conversations belong to the project and save automatically. When you open a project, its newest conversation opens with it.</p>
+      <ul class="plain">
+        <li><strong>Switch or start one:</strong> click the menu at the top left of the chat panel, labelled with the assistant's name. It lists <strong>New Conversation</strong> and your 15 most recent conversations. The menu is disabled while the agent is working.</li>
+        <li><strong>Titles</strong> come from the first line of your first message.</li>
+        <li><strong>Stop</strong> the agent with <kbd>⌘.</kbd> or the stop button. The chat shows "Stopped."</li>
+        <li><strong>Tokens used</strong> appear under the chat box.</li>
+        <li><strong>Switching models</strong> mid-conversation adds a note saying which model wrote the earlier replies.</li>
+      </ul>
+      <p class="sub">There's no delete button yet. Conversations are JSON files; see <a href="#storage">Where things are stored</a>.</p>
+    </section>
+
+    <!-- ============ WATCHING IT WORK ============ -->
+    <section id="activity">
+      <div class="grouphead"><span class="gnum">14.</span><span class="glabel">Watching it work</span></div>
+      <h2>Activity rows and plans</h2>
+      <p>Each action the agent takes appears as a short row in the chat.</p>
+      <div class="activity" role="img" aria-label="Example agent activity rows">
+        <div class="ar"><span class="ok">✓</span> Searched for "discount" — 6 matches in 2 files</div>
+        <div class="ar"><span class="ok">✓</span> Read src/cart.js</div>
+        <div class="ar"><span class="ok">✓</span> Edited src/cart.js</div>
+        <div class="ar"><span class="run">▸</span> Run tests: npm test</div>
+      </div>
+      <ul class="plain">
+        <li>A spinner means running, a green ✓ means it worked, and a red ✗ means it failed.</li>
+        <li>Rows with a chevron expand. Commands show their last 15 output lines, searches show up to 12 matches, and blocked actions show why.</li>
+        <li>While the model is thinking, a faint preview of its reasoning appears.</li>
+      </ul>
+      <h3>The plan</h3>
+      <p>For multi-step work the agent posts an <strong>Implementation Plan</strong> above the chat, with a done count. ✓ is done, ● is in progress, ○ is waiting, and a struck-through step was skipped. Click the header to collapse it. Simple tasks get no plan.</p>
+      <div class="snip"><p class="where"><b>Chat</b></p><div class="codeblock prompt">Use a plan for this: move the settings page to the new form library, then run the tests.</div></div>
+    </section>
+
+    <section id="terminal">
+      <div class="grouphead"><span class="gnum">15.</span><span class="glabel">Watching it work</span></div>
+      <h2>The terminal</h2>
+      <p>The terminal drawer opens under the editor when you press <kbd>⌃`</kbd>, choose <strong>New Terminal</strong>, or when the agent runs a command. It uses your login shell, so your <code>PATH</code> and tools work as they do in Terminal.app.</p>
       <dl class="pairs">
-        <dt>Sign in with ChatGPT</dt><dd>Uses your ChatGPT&nbsp;Plus/Pro account (OAuth). Tokens live in the macOS Keychain and refresh on their own.</dd>
-        <dt>OpenRouter</dt><dd>One key, hundreds of models from OpenAI, Anthropic, Google, Meta, Mistral and more. The harness speaks OpenRouter&rsquo;s universal Chat Completions API, so <em>any</em> model in its catalog works.</dd>
-        <dt>OpenAI API key</dt><dd>Paste a platform key instead &mdash; also stored in the Keychain.</dd>
+        <dt>Terminal header</dt><dd>Click to collapse or expand the drawer.</dd>
+        <dt>+</dt><dd>Open a new shell of your own.</dd>
+        <dt>✕ in the header</dt><dd>Stop and close <em>every</em> terminal tab.</dd>
+        <dt>✕ on a tab</dt><dd>Stop that tab's process and close it.</dd>
+        <dt>⚡ badge</dt><dd>The agent ran this command. Agent tabs are named after the command and are read-only.</dd>
+        <dt>Links</dt><dd>Relative paths like <code>src/cart.js:16</code> are underlined. Click one to open the file at that line.</dd>
       </dl>
-      <h3>Finding a model</h3>
-      <p>Click the model name in the title bar to open a <strong>searchable picker</strong>: fuzzy&#8209;search by name or id, and see each model&rsquo;s context length and price per million tokens before you choose. <kbd>⌘K</kbd> → Change Model works too.</p>
+      <p>In your own tabs, type after the <strong>❯</strong> prompt and press <kbd>Return</kbd>. The drawer is a simple line terminal. It doesn't support <kbd>⌃C</kbd> or full-screen programs like <code>vim</code>, <code>less</code>, or <code>top</code>. Use Terminal.app for those.</p>
+      <h3>How the agent's commands run</h3>
+      <ul class="plain">
+        <li>They run in the project folder, with <code>ROKUBI_HARNESS=1</code> set.</li>
+        <li>A command stops after 120 seconds unless the agent asks for longer, up to 900 seconds.</li>
+        <li>The agent sees the last 400 lines of output. The drawer keeps 5,000.</li>
+      </ul>
+      <div class="snip"><p class="where"><b>Chat</b></p><div class="codeblock prompt">Run the full test suite with a 600 second timeout and summarize the failures.</div></div>
+      <p>Servers and watchers get stopped at the timeout. Start those yourself, then ask the agent to check them.</p>
+      <div class="snip"><p class="where"><b>Terminal</b> in Terminal.app, in your project folder</p><div class="codeblock">npm run dev</div></div>
+      <div class="snip"><p class="where"><b>Chat</b></p><div class="codeblock prompt">The dev server is running on port 3000. Use curl to check that / and /api/health return 200.</div></div>
+    </section>
+
+    <section id="problems">
+      <div class="grouphead"><span class="gnum">16.</span><span class="glabel">Watching it work</span></div>
+      <h2>Problems</h2>
+      <p>When a command the agent runs prints errors in a format the app knows, a <strong>Problems</strong> chip appears under the editor. Output from your own terminal tabs isn't scanned.</p>
+      <ul class="plain">
+        <li>Click the chip to open the list. Click a row to jump to that line. Open files also show squiggles.</li>
+        <li><strong>Fix with AI</strong> in the list header fills the chat box with a fix request for every problem. Right-click one row to fill it for just that problem. Nothing is sent until you press <kbd>Return</kbd>.</li>
+        <li>✕ clears the list. When the same command runs again and passes, its problems disappear.</li>
+      </ul>
+      <div class="snip"><p class="where"><b>Chat</b> what Fix with AI puts in the chat box</p><div class="codeblock prompt">Fix these problems:
+test/cart.test.js:16: fixed discount comes off the order once
+
+@problems</div></div>
+      <div class="tablewrap"><table class="ref">
+        <tr><th>Tool</th><th>Example line it recognizes</th></tr>
+        <tr><td>TypeScript (tsc)</td><td><code>src/a.ts(12,5): error TS2322: Type 'x' is not assignable</code></td></tr>
+        <tr><td>Swift, C, Rust, Go and similar compilers</td><td><code>Sources/App/main.swift:12:5: error: cannot find 'foo' in scope</code></td></tr>
+        <tr><td>ESLint</td><td>a file path line, then <code>12:5  error  Unexpected var  no-var</code></td></tr>
+        <tr><td>cargo</td><td><code>error[E0308]: mismatched types</code> then <code>--&gt; src/main.rs:12:5</code></td></tr>
+        <tr><td>pytest</td><td><code>FAILED tests/test_a.py::test_total - assert 3 == 4</code></td></tr>
+        <tr><td>Jest and Vitest</td><td><code>at Object.&lt;anonymous&gt; (src/a.test.ts:12:5)</code></td></tr>
+        <tr><td>Node's test runner</td><td><code>✖ discount applies once</code> followed by an assertion and its stack</td></tr>
+        <tr><td>go test and go vet</td><td><code>./a.go:12:5: undefined: foo</code></td></tr>
+      </table></div>
+    </section>
+
+    <!-- ============ REVIEW AND UNDO ============ -->
+    <section id="completion">
+      <div class="grouphead"><span class="gnum">17.</span><span class="glabel">Review and undo</span></div>
+      <h2>The completion card</h2>
+      <p>While the agent works, a <strong>N files changed · Review</strong> chip counts its edits. When it finishes, a card shows what changed, what it checked, and a way back.</p>
+      <div class="completion" role="img" aria-label="Example completion card">
+        <p class="cc-tag">TASK COMPLETE</p>
+        <p class="cc-sum">Fixed the cart total: the discount is now applied once to the order.</p>
+        <div class="cc-cols">
+          <div><h5>Changes</h5><div class="row">1 file changed</div></div>
+          <div><h5>Verified</h5>
+            <div class="row"><span style="color:var(--allow)">✓</span> Tests — 5/5 passed</div>
+            <div class="row"><span style="color:var(--ask)">?</span> Lint — not run</div>
+          </div>
+        </div>
+        <div class="cc-actions"><span class="btn primary">Review Changes</span><span class="btn">Commit</span><span class="btn danger">Undo Task</span></div>
+      </div>
+      <dl class="pairs">
+        <dt>✓ passed</dt><dd>The agent ran the check and saw it pass.</dd>
+        <dt>✗ failed</dt><dd>It ran the check and it failed.</dd>
+        <dt>– skipped</dt><dd>It chose not to run it.</dd>
+        <dt>? not run</dt><dd>It couldn't run it. "Nothing verified" means no checks at all.</dd>
+      </dl>
+      <div class="tablewrap"><table class="ref">
+        <tr><th>Button</th><th>What it does</th><th>Disabled when</th></tr>
+        <tr><td>Review Changes</td><td>Opens the <a href="#changes">diff review</a>.</td><td>No files changed</td></tr>
+        <tr><td>Commit</td><td>Stages <em>everything</em> and commits. See <a href="#git">Git</a>.</td><td>Not a git repository, or no files changed</td></tr>
+        <tr><td>Undo Task</td><td>Restores every file the task touched. See <a href="#checkpoints">Checkpoints</a>.</td><td>No files changed</td></tr>
+      </table></div>
+    </section>
+
+    <section id="changes">
+      <div class="grouphead"><span class="gnum">18.</span><span class="glabel">Review and undo</span></div>
+      <h2>Reviewing changes</h2>
+      <p>Open the review from the <strong>Review</strong> chip, <strong>Review Changes</strong> on the completion card, or the command palette. Changed files are listed on the left. Each file shows side by side: the version from before the task on the left, and the current file on the right.</p>
+      <div class="tablewrap"><table class="ref">
+        <tr><th>Control</th><th>What it does</th></tr>
+        <tr><td>Accept File</td><td>Keep this file's changes, remove it from the list, and go to the next file.</td></tr>
+        <tr><td>Reject File</td><td>Put this file back the way it was before the task.</td></tr>
+        <tr><td>Revert</td><td>Next to each change in the list under the diff. Undo just that change and keep the rest.</td></tr>
+        <tr><td>Right-hand pane</td><td>Type to adjust the result. Your edits save to disk after a moment.</td></tr>
+        <tr><td>Accept All</td><td>Mark every file as reviewed and close.</td></tr>
+        <tr><td>Reject All</td><td>Run <strong>Undo Task</strong>: restore every file the task touched, then close.</td></tr>
+        <tr><td>Close</td><td>Save any pending edits and close.</td></tr>
+      </table></div>
+      <p class="sub">Accepting doesn't commit anything. It only clears the file from the review list.</p>
+    </section>
+
+    <section id="checkpoints">
+      <div class="grouphead"><span class="gnum">19.</span><span class="glabel">Review and undo</span></div>
+      <h2>Checkpoints and undo</h2>
+      <p>One message you send is one task. Before the agent edits, creates, renames, or deletes a file, the app saves a copy. This works even in folders that aren't git repositories.</p>
+      <dl class="pairs">
+        <dt>Undo Task</dt><dd>Restores every file the task touched and removes files it created. Find it on the completion card, in the command palette, or as <strong>Reject All</strong> in the review.</dd>
+        <dt>Reject File</dt><dd>Restores one file, from the review.</dd>
+        <dt>Revert</dt><dd>Restores one change inside a file, from the review.</dd>
+      </dl>
+      <div class="note warn">
+        <span class="tag">What undo can't bring back</span>
+        <p>Changes made by commands the agent ran, like <code>npm install</code> or a code formatter. Folder renames and deletes. Your own edits. Undo works only for the latest task in the window, and switching conversations clears it. Files the agent deleted also sit in the Finder Trash.</p>
+      </div>
+      <p>For big tasks, give yourself a git safety net first.</p>
+      <div class="snip">
+        <p class="where"><b>Terminal</b> before a big task</p>
+        <div class="codeblock">git add -A &amp;&amp; git commit -m "Checkpoint before agent task"</div>
+      </div>
+      <div class="snip">
+        <p class="where"><b>Terminal</b> set the agent's attempt aside, keeping it recoverable</p>
+        <div class="codeblock">git stash push -u -m "agent attempt"
+git stash list              <span class="c"># bring it back later with: git stash pop</span></div>
+      </div>
+    </section>
+
+    <section id="git">
+      <div class="grouphead"><span class="gnum">20.</span><span class="glabel">Review and undo</span></div>
+      <h2>Git</h2>
+      <p>The agent's git tools can read <code>git status</code>, <code>git diff</code>, and <code>git log</code>. Anything else, like committing, has to go through a terminal command, which your autonomy setting controls. Force pushes are always blocked. The app doesn't show the current branch.</p>
+      <div class="note warn">
+        <span class="tag">Commit stages everything</span>
+        <p><strong>Commit</strong> on the completion card, and <strong>Git Commit…</strong> in the palette, run <code>git add -A</code>. That includes your own unrelated changes. The commit message is the first line of the task summary. There's no confirmation step.</p>
+      </div>
+      <div class="snip"><p class="where"><b>Chat</b></p><div class="codeblock prompt">Look at git status and git diff, then write a short commit message for these changes. Don't commit.</div></div>
+      <div class="snip">
+        <p class="where"><b>Terminal</b> commit only the files you choose</p>
+        <div class="codeblock">git status
+git add src/cart.js test/cart.test.js
+git commit -m "Apply the discount once per order"</div>
+      </div>
+      <div class="snip">
+        <p class="where"><b>Terminal</b> change the message after using Commit</p>
+        <div class="codeblock">git commit --amend -m "Apply the discount once per order, not per line"</div>
+      </div>
+      <div class="snip">
+        <p class="where"><b>Terminal</b> work on a branch</p>
+        <div class="codeblock">git switch -c agent/dark-mode</div>
+      </div>
+    </section>
+
+    <!-- ============ RULES AND SAFETY ============ -->
+    <section id="permissions">
+      <div class="grouphead"><span class="gnum">21.</span><span class="glabel">Rules and safety</span></div>
+      <h2>Permission rules: <code>.rokubi/permissions.json</code></h2>
+      <p>This file sets rules for one project. It's read every time you send a message, and it can live in your repository so the whole team shares it. It's a JSON list. Each rule has a <code>class</code>, an optional <code>match</code>, and a <code>decision</code>.</p>
+      <div class="tablewrap"><table class="ref">
+        <tr><th>class</th><th>Covers</th><th>match is compared with</th></tr>
+        <tr><td><code>run</code></td><td>Terminal commands</td><td>The whole command line</td></tr>
+        <tr><td><code>edit</code></td><td>Editing, rewriting, and renaming files</td><td>The file path</td></tr>
+        <tr><td><code>create</code></td><td>Creating files</td><td>The file path</td></tr>
+        <tr><td><code>delete</code></td><td>Moving files to the Trash</td><td>The file path</td></tr>
+        <tr><td><code>read</code></td><td>Reading and listing files</td><td>The file path</td></tr>
+        <tr><td><code>search</code></td><td>Finding files and searching contents</td><td>Rules without a match only</td></tr>
+        <tr><td><code>gitRead</code></td><td>git status, diff, and log</td><td>Rules without a match only</td></tr>
+      </table></div>
+      <ul class="plain">
+        <li><strong>decision</strong> is <code>allow</code>, <code>ask</code>, or <code>deny</code>.</li>
+        <li><strong>match for run:</strong> <code>*</code> matches anything, including spaces and slashes. <code>npm test*</code> matches <code>npm test -- --watch</code>.</li>
+        <li><strong>match for paths:</strong> paths are relative to the project. <code>*</code> stays inside one folder, <code>**</code> crosses folders, and <code>{a,b}</code> means either.</li>
+        <li><strong>No match</strong> means the rule covers every action in that class.</li>
+        <li><strong>Order:</strong> the always-blocked list, then this task's Always Allow answers, then this file, then your autonomy setting. Inside the file, the <em>last</em> matching rule wins.</li>
+      </ul>
+      <div class="note warn">
+        <span class="tag">Silently ignored</span>
+        <p>A rule that says <code>allow</code> with no <code>match</code> is dropped for anything beyond reading and searching, so a cloned repository can't give itself free rein. And if <em>any</em> rule has a typo, like <code>"Run"</code> instead of <code>"run"</code>, the whole file is ignored.</p>
+      </div>
+      <div class="snip">
+        <p class="where"><b>Terminal</b> Node project: run tests, lint, and type-check without asking</p>
+        <div class="codeblock">mkdir -p .rokubi
+cat &gt; .rokubi/permissions.json &lt;&lt;'EOF'
+[
+  {"class": "run", "match": "npm test*", "decision": "allow"},
+  {"class": "run", "match": "npm run lint*", "decision": "allow"},
+  {"class": "run", "match": "npx tsc --noEmit*", "decision": "allow"}
+]
+EOF</div>
+      </div>
+      <div class="snip">
+        <p class="where"><b>File</b> .rokubi/permissions.json for a Swift package</p>
+        <div class="codeblock">[
+  {"class": "run", "match": "swift build*", "decision": "allow"},
+  {"class": "run", "match": "swift test*", "decision": "allow"}
+]</div>
+      </div>
+      <div class="snip">
+        <p class="where"><b>File</b> .rokubi/permissions.json with guard rails that hold even in Full Autonomy</p>
+        <div class="codeblock">[
+  {"class": "run", "match": "*npm publish*", "decision": "deny"},
+  {"class": "run", "match": "git commit*", "decision": "ask"},
+  {"class": "delete", "decision": "ask"},
+  {"class": "edit", "match": "db/migrations/**", "decision": "deny"},
+  {"class": "create", "match": "db/migrations/**", "decision": "deny"}
+]</div>
+      </div>
+      <div class="tablewrap"><table class="ref">
+        <tr><th>With the guard rails, in Full Autonomy</th><th>Result</th></tr>
+        <tr><td><code>npm test</code></td><td><span class="d allow">allow</span></td></tr>
+        <tr><td><code>cd pkg &amp;&amp; npm publish --tag next</code></td><td><span class="d deny">deny</span></td></tr>
+        <tr><td><code>git commit -m wip</code></td><td><span class="d ask">ask</span></td></tr>
+        <tr><td>Delete <code>src/old.ts</code></td><td><span class="d ask">ask</span></td></tr>
+        <tr><td>Edit <code>db/migrations/2026/002.sql</code></td><td><span class="d deny">deny</span></td></tr>
+        <tr><td>Edit <code>src/app.ts</code></td><td><span class="d allow">allow</span></td></tr>
+      </table></div>
+      <div class="snip">
+        <p class="where"><b>Terminal</b> check the file is valid JSON</p>
+        <div class="codeblock">python3 -m json.tool .rokubi/permissions.json</div>
+      </div>
+    </section>
+
+    <section id="safety">
+      <div class="grouphead"><span class="gnum">22.</span><span class="glabel">Rules and safety</span></div>
+      <h2>Hard limits and secrets</h2>
+      <h3>Always blocked, at every autonomy level</h3>
+      <ul class="plain">
+        <li>Force pushes: <code>git push</code> with <code>--force</code>, <code>--force-with-lease</code>, <code>-f</code>, or a <code>+branch</code>.</li>
+        <li><code>rm</code> aimed at <code>/</code>, <code>~</code>, or <code>$HOME</code>.</li>
+        <li><code>sudo</code> and <code>doas</code>.</li>
+        <li>Formatting disks with <code>mkfs</code>, writing to raw disks with <code>dd</code> or <code>&gt; /dev/disk…</code>, and <code>chmod -R 777 /</code> or <code>chown -R … /</code>.</li>
+        <li>The shell fork bomb.</li>
+      </ul>
+      <p class="sub">Ordinary commands like <code>rm -rf node_modules</code> are not blocked. This list is a backstop, not a sandbox: commands run in your real login shell.</p>
+      <h3>Secret files</h3>
+      <p>The agent can't read, edit, search, rename, or delete files named <code>.env</code>, <code>.env.*</code>, <code>*.pem</code>, <code>*.key</code>, <code>*.p12</code>, <code>credentials.json</code>, <code>id_rsa</code>, or <code>id_ed25519</code>. Every path must stay inside the project, even through symlinks.</p>
+      <div class="note warn">
+        <span class="tag">Gaps to know about</span>
+        <p>Secret file <em>names</em> still show up in file listings. <code>git diff</code> shows the contents of secrets you've committed. A terminal command like <code>cat .env</code> can read them if you allow commands. On repositories you don't trust, stay on Standard or Ask Before Commands.</p>
+      </div>
+      <h3>What the agent skips when searching</h3>
+      <p>File listings, search, and the project map skip <code>node_modules</code>, <code>.build</code>, <code>DerivedData</code>, <code>dist</code>, <code>build</code>, <code>target</code>, <code>.venv</code>, <code>__pycache__</code>, <code>.next</code>, <code>coverage</code>, <code>Pods</code>, and similar folders, plus your root <code>.gitignore</code>. The agent can still open one of those files if it names the exact path.</p>
+    </section>
+
+    <section id="tools">
+      <div class="grouphead"><span class="gnum">23.</span><span class="glabel">Rules and safety</span></div>
+      <h2>Tool reference</h2>
+      <p>The agent can only act through these tools. You'll see their results as activity rows.</p>
+      <div class="tablewrap"><table class="ref">
+        <tr><th>Tool</th><th>What it does</th><th>Limits</th><th>class</th></tr>
+        <tr><td><code>read_file</code></td><td>Read a text file with line numbers</td><td>400 lines per call; files up to 4 MB</td><td>read</td></tr>
+        <tr><td><code>list_dir</code></td><td>List one folder</td><td>One level deep</td><td>read</td></tr>
+        <tr><td><code>glob</code></td><td>Find files by name, like <code>src/**/*.test.js</code></td><td>500 results</td><td>search</td></tr>
+        <tr><td><code>grep</code></td><td>Search file contents</td><td>Up to 300 results, 20 per file</td><td>search</td></tr>
+        <tr><td><code>apply_patch</code></td><td>Replace exact text in a file</td><td>Each old text must appear once</td><td>edit</td></tr>
+        <tr><td><code>write_file</code></td><td>Replace a whole file, or create it</td><td></td><td>edit</td></tr>
+        <tr><td><code>create_file</code></td><td>Create a new file</td><td>Fails if it exists</td><td>create</td></tr>
+        <tr><td><code>rename_path</code></td><td>Move or rename a file or folder</td><td>Fails if the target exists</td><td>edit</td></tr>
+        <tr><td><code>delete_path</code></td><td>Move a file or folder to the Trash</td><td></td><td>delete</td></tr>
+        <tr><td><code>run_command</code></td><td>Run a shell command in the project folder</td><td>120 s default, 900 s max; last 400 lines</td><td>run</td></tr>
+        <tr><td><code>git_status</code></td><td>Show status and branch</td><td></td><td>gitRead</td></tr>
+        <tr><td><code>git_diff</code></td><td>Show unstaged or staged changes</td><td>40,000 characters</td><td>gitRead</td></tr>
+        <tr><td><code>git_log</code></td><td>Show recent commits</td><td>Up to 100</td><td>gitRead</td></tr>
+        <tr><td><code>update_plan</code></td><td>Show or update the plan</td><td></td><td>read</td></tr>
+        <tr><td><code>report_completion</code></td><td>Show the completion card</td><td></td><td>read</td></tr>
+      </table></div>
+      <p class="sub">A task stops after 60 rounds of tool calls with a note asking you to continue. Any single tool result is cut to 60,000 characters.</p>
+    </section>
+
+    <!-- ============ REFERENCE ============ -->
+    <section id="palette">
+      <div class="grouphead"><span class="gnum">24.</span><span class="glabel">Reference</span></div>
+      <h2>Command palette</h2>
+      <p>Press <kbd>⌘K</kbd>. Type to filter, use <kbd>↑</kbd> <kbd>↓</kbd> to move, <kbd>Return</kbd> to run, and <kbd>Esc</kbd> to close.</p>
+      <div class="tablewrap"><table class="ref">
+        <tr><th>Command</th><th>What it does</th></tr>
+        <tr><td>Open Folder…</td><td>Adds a folder to Recent. Use <kbd>⌘O</kbd> to actually open it.</td></tr>
+        <tr><td>Review Changes</td><td>Opens the diff review.</td></tr>
+        <tr><td>Open Terminal</td><td>Opens a new shell.</td></tr>
+        <tr><td>Format File</td><td>Formats the open file.</td></tr>
+        <tr><td>Find in File</td><td>Opens find in the editor.</td></tr>
+        <tr><td>Reload File Tree</td><td>Rereads the file list from disk.</td></tr>
+        <tr><td>New Conversation</td><td>Starts a fresh conversation.</td></tr>
+        <tr><td>Undo Task</td><td>Restores files to the start of the last task.</td></tr>
+        <tr><td>Change Model: <em>name</em></td><td>Switches model. The first 40 models are listed.</td></tr>
+        <tr><td>/<em>skill</em></td><td>Puts <code>/skill </code> in the chat box.</td></tr>
+        <tr><td>Git Commit…</td><td>In git repositories only. Stages everything and commits with the last summary.</td></tr>
+      </table></div>
+    </section>
+
+    <section id="keys">
+      <div class="grouphead"><span class="gnum">25.</span><span class="glabel">Reference</span></div>
+      <h2>Keyboard shortcuts</h2>
+      <div class="tablewrap"><table class="ref">
+        <tr><th>Keys</th><th>Action</th><th>Where</th></tr>
+        <tr><td><kbd>⌘O</kbd></td><td>Open Folder…</td><td>Anywhere</td></tr>
+        <tr><td><kbd>⌘K</kbd></td><td>Command palette</td><td>Project window</td></tr>
+        <tr><td><kbd>⌃`</kbd></td><td>New terminal</td><td>Project window</td></tr>
+        <tr><td><kbd>⌘S</kbd></td><td>Save</td><td>Editor</td></tr>
+        <tr><td><kbd>⌥⌘S</kbd></td><td>Save all</td><td>Editor</td></tr>
+        <tr><td><kbd>⌘W</kbd></td><td>Close editor tab, without a save prompt</td><td>Editor</td></tr>
+        <tr><td><kbd>⌘F</kbd></td><td>Find</td><td>Editor</td></tr>
+        <tr><td><kbd>⌥⌘F</kbd></td><td>Find and replace</td><td>Editor</td></tr>
+        <tr><td><kbd>⌘L</kbd></td><td>Go to line</td><td>Editor</td></tr>
+        <tr><td><kbd>⌥⇧⌘F</kbd></td><td>Format document</td><td>Editor</td></tr>
+        <tr><td><kbd>⌘/</kbd></td><td>Toggle line comment</td><td>Editor</td></tr>
+        <tr><td><kbd>⇧⌘P</kbd></td><td>Monaco's own command list</td><td>Editor</td></tr>
+        <tr><td><kbd>⌥</kbd> + click</td><td>Add a cursor</td><td>Editor</td></tr>
+        <tr><td><kbd>Return</kbd> or <kbd>⌘Return</kbd></td><td>Send message</td><td>Chat box</td></tr>
+        <tr><td><kbd>Tab</kbd></td><td>Accept the first <code>@</code> or <code>/</code> suggestion</td><td>Chat box</td></tr>
+        <tr><td><kbd>⌘.</kbd></td><td>Stop the agent</td><td>While it's working</td></tr>
+        <tr><td><kbd>Return</kbd> / <kbd>Esc</kbd></td><td>Allow / Deny</td><td>Approval card</td></tr>
+        <tr><td><kbd>↑</kbd> <kbd>↓</kbd> <kbd>Return</kbd> <kbd>Esc</kbd></td><td>Move, run, close</td><td>Command palette</td></tr>
+      </table></div>
+    </section>
+
+    <section id="storage">
+      <div class="grouphead"><span class="gnum">26.</span><span class="glabel">Reference</span></div>
+      <h2>Where things are stored</h2>
+      <div class="tablewrap"><table class="ref">
+        <tr><th>What</th><th>Where</th></tr>
+        <tr><td>Project permission rules</td><td><code>&lt;project&gt;/.rokubi/permissions.json</code></td></tr>
+        <tr><td>Team skills</td><td><code>&lt;project&gt;/.rokubi/skills/*.md</code></td></tr>
+        <tr><td>Personal skills</td><td><code>~/.rokubi/skills/*.md</code></td></tr>
+        <tr><td>Project instructions</td><td><code>&lt;project&gt;/AGENTS.md</code></td></tr>
+        <tr><td>Conversations</td><td><code>~/Library/Application Support/ROKUBI Harness/projects/&lt;id&gt;/conversations/</code></td></tr>
+        <tr><td>Undo checkpoints</td><td><code>~/Library/Application Support/ROKUBI Harness/projects/&lt;id&gt;/checkpoints/</code></td></tr>
+        <tr><td>Keys and tokens</td><td>Keychain, service <code>com.rokubi.harness</code></td></tr>
+        <tr><td>Autonomy, model, account, recent projects</td><td>App preferences, domain <code>com.rokubi.harness</code></td></tr>
+      </table></div>
+      <p>Each project gets its own folder under <code>projects</code>, named from its path. Checkpoints are never cleaned up automatically. Quit the app before changing any of these.</p>
+      <div class="snip">
+        <p class="where"><b>Terminal</b> look around</p>
+        <div class="codeblock">open ~/Library/Application\ Support/ROKUBI\ Harness/projects      <span class="c"># conversations and checkpoints</span>
+du -sh ~/Library/Application\ Support/ROKUBI\ Harness/projects/*   <span class="c"># space used per project</span>
+defaults read com.rokubi.harness                                    <span class="c"># app preferences</span></div>
+      </div>
+      <div class="snip">
+        <p class="where"><b>Terminal</b> reset autonomy to Standard, with the app quit</p>
+        <div class="codeblock">defaults delete com.rokubi.harness autonomy.preset</div>
+      </div>
+    </section>
+
+    <section id="troubleshooting">
+      <div class="grouphead"><span class="gnum">27.</span><span class="glabel">Reference</span></div>
+      <h2>Troubleshooting</h2>
+      <div class="tablewrap"><table class="ref">
+        <tr><th>Problem</th><th>Fix</th></tr>
+        <tr><td>The agent just chats and never runs anything</td><td>The model can't call tools well. Pick a stronger one and send the same message again.</td></tr>
+        <tr><td>A Keychain prompt after every rebuild</td><td>Expected for locally signed builds. Click Always Allow.</td></tr>
+        <tr><td>"Port 1455 is already in use"</td><td>Another sign-in window is open. Close it, or find what's using the port with the command below.</td></tr>
+        <tr><td>"The ChatGPT account has no account id; is a workspace selected?"</td><td>Choose a workspace in ChatGPT, then sign in again.</td></tr>
+        <tr><td>An error on the first message after pasting a key</td><td>The key is wrong. Open ••• › Sign Out and connect again.</td></tr>
+        <tr><td>A command "timed out"</td><td>Ask for a longer timeout, up to 900 seconds, or run it yourself in Terminal.app.</td></tr>
+        <tr><td>My permission rules do nothing</td><td>Check the JSON is valid and every <code>class</code> is spelled exactly. A blanket <code>allow</code> is ignored. Paths are relative to the project.</td></tr>
+        <tr><td>No Problems chip</td><td>Only commands the agent runs are scanned, and only in the formats listed under <a href="#problems">Problems</a>.</td></tr>
+        <tr><td><code>@file</code> attached nothing</td><td>The path must match exactly, relative to the project. Secret files are skipped.</td></tr>
+        <tr><td>A new skill doesn't show up</td><td>It must be a <code>.md</code> file directly inside the skills folder, with no spaces in its name. Open <kbd>⌘K</kbd> to refresh.</td></tr>
+        <tr><td>Undo Task didn't restore something</td><td>Undo doesn't cover changes made by commands. Use git; see <a href="#checkpoints">Checkpoints</a>.</td></tr>
+        <tr><td>My unsaved edits vanished</td><td>Closing a tab doesn't ask to save. Save with <kbd>⌘S</kbd> before closing.</td></tr>
+        <tr><td>Open Folder… in the palette doesn't open anything</td><td>Known issue. Use <kbd>⌘O</kbd>.</td></tr>
+      </table></div>
+      <div class="snip">
+        <p class="where"><b>Terminal</b> see what's using the sign-in port</p>
+        <div class="codeblock">lsof -nP -iTCP:1455 -sTCP:LISTEN</div>
+      </div>
+    </section>
+
+    <section id="contributors">
+      <div class="grouphead"><span class="gnum">28.</span><span class="glabel">Reference</span></div>
+      <h2>For contributors</h2>
+      <p>Architecture, conventions, and the security model are in <code>AGENTS.md</code> at the repository root.</p>
+      <div class="tablewrap"><table class="ref">
+        <tr><th>Script</th><th>What it does</th></tr>
+        <tr><td><code>scripts/bootstrap.sh</code></td><td>One-time setup: XcodeGen and the Monaco dependencies.</td></tr>
+        <tr><td><code>scripts/build.sh [Debug|Release]</code></td><td>Builds the editor bundle, generates the Xcode project, and builds into <code>DerivedData</code>.</td></tr>
+        <tr><td><code>scripts/run.sh</code></td><td>Debug build, then open it.</td></tr>
+        <tr><td><code>scripts/package.sh [--install]</code></td><td>Release build copied to <code>./RokubiHarness.app</code>, and to Applications with <code>--install</code>.</td></tr>
+        <tr><td><code>scripts/test.sh</code></td><td>Unit tests for every Swift package.</td></tr>
+        <tr><td><code>scripts/smoke.sh [--openrouter]</code></td><td>End-to-end run against a scripted mock model. Checks that the demo gets fixed.</td></tr>
+      </table></div>
+      <div class="snip">
+        <p class="where"><b>Terminal</b> test everything, no network or API key needed</p>
+        <div class="codeblock">scripts/test.sh
+scripts/smoke.sh
+SMOKE_SKIP_BUILD=1 scripts/smoke.sh --openrouter    <span class="c"># reuse the build, Chat Completions flavour</span></div>
+      </div>
+      <div class="snip">
+        <p class="where"><b>Terminal</b> drive the Debug app by hand against the mock</p>
+        <div class="codeblock">cp -R demo-project /tmp/demo
+python3 scripts/mock-openai.py 8765 &amp;
+open -n DerivedData/Build/Products/Debug/RokubiHarness.app --args \
+  --project /tmp/demo --base-url http://127.0.0.1:8765 --api-key test \
+  --prompt "Fix the failing test"</div>
+      </div>
+      <div class="tablewrap"><table class="ref">
+        <tr><th>Launch flag</th><th>What it does</th><th>Builds</th></tr>
+        <tr><td><code>--project &lt;dir&gt;</code>, <code>--open &lt;file&gt;</code></td><td>Open a folder, and a file in it.</td><td>All</td></tr>
+        <tr><td><code>--api-key</code>, <code>--openrouter-key</code></td><td>Use a key without touching the Keychain.</td><td>Debug</td></tr>
+        <tr><td><code>--base-url &lt;url&gt;</code></td><td>Point the app at a mock server.</td><td>Debug</td></tr>
+        <tr><td><code>--prompt "&lt;text&gt;"</code></td><td>Send one message automatically.</td><td>Debug</td></tr>
+        <tr><td><code>--snapshot &lt;png&gt;</code>, <code>--snapshot-delay=&lt;s&gt;</code>, <code>--quit-after-snapshot</code></td><td>Save a picture of the window, then optionally quit.</td><td>Debug</td></tr>
+      </table></div>
     </section>
 
     <footer>
       <div class="measure">
         <p class="fin">Simple when the task is simple; more powerful only as the task grows.</p>
-        <p>For contributors: set up once with <code>scripts/bootstrap.sh</code>, then build with <code>scripts/build.sh</code>, test with <code>scripts/test.sh</code>, and launch with <code>scripts/run.sh</code>. To exercise the whole agent loop offline, run the smoke test: it opens a copy of <code>demo-project</code> against a scripted mock model, lets it fix the failing test, and checks that the tests pass.</p>
-        <div class="codeblock"><span class="c"># no network, no API key</span>
-scripts/smoke.sh
-scripts/smoke.sh <span class="a">--openrouter</span>   <span class="c"># same run over Chat Completions</span></div>
-        <p style="color:var(--faint); font-size:13px; margin-top:24px;">ROKUBI Harness · <span style="font-family:var(--mono)">Claude Code Fable 5.1</span> · This guide describes the app&rsquo;s built features; the ChatGPT sign-in backend is undocumented and may change.</p>
+        <p style="color:var(--faint); font-size:13px; margin-top:24px;">This guide describes the app in this repository. The ChatGPT sign-in backend is undocumented and may change.</p>
       </div>
     </footer>
 
@@ -676,6 +1252,41 @@ scripts/smoke.sh <span class="a">--openrouter</span>   <span class="c"># same ru
     apply();
     document.getElementById("themeBtn").addEventListener("click", function () {
       i = (i + 1) % order.length; apply();
+    });
+  })();
+
+  // Copy buttons: every .codeblock gets one; it copies the block's text without the button label.
+  (function () {
+    function fallbackCopy(text) {
+      var ta = document.createElement("textarea");
+      ta.value = text; ta.setAttribute("readonly", ""); ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.select();
+      var ok = false; try { ok = document.execCommand("copy"); } catch (e) {}
+      document.body.removeChild(ta); return ok;
+    }
+    document.querySelectorAll(".codeblock").forEach(function (block) {
+      var btn = document.createElement("button");
+      btn.type = "button"; btn.className = "copybtn"; btn.textContent = "Copy";
+      btn.setAttribute("aria-label", "Copy to clipboard");
+      btn.addEventListener("click", function () {
+        var clone = block.cloneNode(true);
+        var b = clone.querySelector(".copybtn"); if (b) b.remove();
+        var text = clone.textContent.replace(/^\n+|\s+$/g, "");
+        function flash(label) {
+          btn.textContent = label; btn.classList.add("done");
+          setTimeout(function () { btn.textContent = "Copy"; btn.classList.remove("done"); }, 1400);
+        }
+        if (navigator.clipboard && window.isSecureContext) {
+          navigator.clipboard.writeText(text).then(function () { flash("Copied"); },
+            function () { flash(fallbackCopy(text) ? "Copied" : "Press ⌘C"); });
+        } else {
+          flash(fallbackCopy(text) ? "Copied" : "Press ⌘C");
+        }
+      });
+      // Sit in the label row above the box when there is one, so it never covers the code.
+      var where = block.parentElement && block.parentElement.classList.contains("snip")
+        ? block.parentElement.querySelector(".where") : null;
+      (where || block).appendChild(btn);
     });
   })();
 
