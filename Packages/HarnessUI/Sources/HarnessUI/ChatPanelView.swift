@@ -15,15 +15,18 @@ public struct ChatPanelView: View {
     @State private var openRouterVisible = false
     @Binding var prefill: String?
     @Binding var showReview: Bool
+    @Binding var showCommit: Bool
     @State private var suggestions: [ComposerSuggestion] = []
     /// Project files + folders for `@` mentions, built off the main actor (see `rebuildFileIndex`).
     @State private var fileIndex: [String] = []
 
-    public init(session: AgentSession, editor: EditorCoordinator, prefill: Binding<String?> = .constant(nil), showReview: Binding<Bool> = .constant(false)) {
+    public init(session: AgentSession, editor: EditorCoordinator, prefill: Binding<String?> = .constant(nil), showReview: Binding<Bool> = .constant(false),
+                showCommit: Binding<Bool> = .constant(false)) {
         self.session = session
         self.editor = editor
         _prefill = prefill
         _showReview = showReview
+        _showCommit = showCommit
     }
 
     private var assistantName: String { AssistantIdentity.name(mode: auth.account?.mode, model: models.selectedInfo) }
@@ -129,9 +132,9 @@ public struct ChatPanelView: View {
                     }
                     if let report = session.completion, !session.isRunning {
                         CompletionCard(report: report, changedCount: session.changedFiles.count,
-                                       onReview: { showReview = true }, onCommit: { session.commitChanges(report.summary) },
+                                       onReview: { showReview = true }, onCommit: { showCommit = true },
                                        onUndo: { Task { await session.undoTask() } },
-                                       canReview: true, canCommit: session.isGitRepository)
+                                       canReview: true, canCommit: session.isGitRepository && session.currentTaskID != nil)
                     }
                     if session.isRunning && session.streamingOrder.isEmpty && session.reasoningPreview.isEmpty && session.pendingPermission == nil {
                         HStack(spacing: 6) { ProgressView().controlSize(.small); Text("Thinking…").font(.callout).foregroundStyle(.tertiary) }

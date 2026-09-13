@@ -173,9 +173,17 @@ struct DeletePathTool: Tool {
         let url = try context.files.resolve(path)
         guard !context.files.isProtected(url) else { throw ToolError("\(path) is protected") }
         guard context.files.exists(url) else { throw ToolError("\(path) does not exist") }
-        if !context.files.isDirectory(url) { try await context.willMutate(url, label: "delete_path \(path)") }
-        try context.files.trash(url)
-        await context.didMutate(url)
+        if context.files.isDirectory(url) {
+            // A folder can hold many files: capture them all so Undo Task can bring the folder back.
+            let before = await context.captureTree()
+            try context.files.trash(url)
+            await context.recordChanges(since: before, label: "delete_path \(path)")
+            await context.didMutate(url)
+        } else {
+            try await context.willMutate(url, label: "delete_path \(path)")
+            try context.files.trash(url)
+            await context.didMutate(url)
+        }
         return ToolOutput("Moved \(path) to the Trash", activity: ActivityRecord(kind: .delete, title: "Deleted \(path)"))
     }
 }
@@ -199,11 +207,15 @@ struct RenamePathTool: Tool {
         let src = try context.files.resolve(from), dst = try context.files.resolve(to)
         // Renaming a secret to an innocuous name would let a later read_file bypass the exclusion list.
         guard !context.files.isProtected(src), !context.files.isProtected(dst) else { throw ToolError("\(from) is protected") }
-        if !context.files.isDirectory(src) {
+        if context.files.isDirectory(src) {
+            let before = await context.captureTree()
+            try context.files.move(src, to: dst)
+            await context.recordChanges(since: before, label: "rename_path \(from) → \(to)")
+        } else {
             try await context.willMutate(src, label: "rename_path \(from)")
             try await context.willMutate(dst, label: "rename_path \(to)")
+            try context.files.move(src, to: dst)
         }
-        try context.files.move(src, to: dst)
         await context.didMutate(src)
         await context.didMutate(dst)
         return ToolOutput("Moved \(from) to \(to)", activity: ActivityRecord(kind: .edit, title: "Moved \(from) → \(to)"))

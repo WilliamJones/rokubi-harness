@@ -45,7 +45,9 @@ struct RunCommandTool: Tool {
     func execute(_ a: JSONValue, context: ToolContext) async throws -> ToolOutput {
         let command = try a.requiredString("command")
         let timeout = TimeInterval(min(900, max(1, a.int("timeout_seconds") ?? 120)))
+        let before = await context.captureTree()
         let result = await executor.run(command, timeout: timeout)
+        let changedByCommand = await context.recordChanges(since: before, label: "run_command \(command)")
 
         let problems = DiagnosticsParser.parse(result.output, projectRoot: context.files.root)
         await context.sink.diagnosticsReported(problems, source: command)
@@ -55,6 +57,10 @@ struct RunCommandTool: Tool {
         text += " · \(String(format: "%.1f", result.duration))s\n"
         text += result.output.isEmpty ? "(no output)" : result.output
         if !problems.isEmpty { text += "\n\n\(problems.count) diagnostic(s) parsed and shown in Problems." }
+        if !changedByCommand.isEmpty {
+            let listed = changedByCommand.prefix(20).joined(separator: ", ")
+            text += "\n\nFiles changed by this command (\(changedByCommand.count)): \(listed)\(changedByCommand.count > 20 ? ", …" : "")"
+        }
 
         let ok = result.exitCode == 0 && !result.timedOut
         let title = "\(summary(for: a))" + (ok ? "" : result.timedOut ? " — timed out" : " — exit \(result.exitCode)")

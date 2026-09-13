@@ -39,7 +39,7 @@ struct HarnessCommands: Commands {
                 .disabled(workspace?.hasUnsavedChanges != true)
 
             Button("Close Editor") {
-                if let ws = workspace, let id = ws.activeDocumentID { ws.close(id) }
+                if let ws = workspace, let id = ws.activeDocumentID { ws.requestClose(id) }
             }
             .keyboardShortcut("w")
             .disabled(workspace?.activeDocument == nil)

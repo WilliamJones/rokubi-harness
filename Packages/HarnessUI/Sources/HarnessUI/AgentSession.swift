@@ -127,7 +127,9 @@ public final class AgentSession {
         changedFiles = []
 
         let tools = ToolFactory.defaultTools(executor: TerminalExecutor(runner: CommandRunner(terminals: terminals)), extra: extraTools)
-        let policy = PermissionPolicy(preset: autonomy, project: PermissionPolicy.loadProjectRules(root: workspace.root))
+        let projectRules = PermissionPolicy.loadProjectRulesReport(root: workspace.root)
+        if !projectRules.warnings.isEmpty { lastError = projectRules.summary }   // the other rules still apply
+        let policy = PermissionPolicy(preset: autonomy, project: projectRules.rules)
         let gate = PermissionEngine(policy: policy) { [weak self] request in
             await self?.ask(request) ?? .deny
         }
@@ -193,20 +195,43 @@ public final class AgentSession {
     /// plain observable read (a lazy var here initialized *during* body and spawned `git` mid-render).
     public private(set) var isGitRepository = false
 
-    /// Stages all changes and commits — the human action from the completion card.
-    public func commitChanges(_ message: String) {
-        let git = GitService(root: workspace.root)
-        do {
-            if !git.isRepository { lastError = "This project is not a git repository."; return }
-            try git.stageAll()
-            let subject = message.split(whereSeparator: \.isNewline).first.map(String.init) ?? "Update"
-            _ = try git.commit(message: subject)
-            conversation.append(.note(id: UUID().uuidString, text: "Committed: \(subject)"))
-            changedFiles = []
-            store.save(conversation)
-        } catch {
-            lastError = "Commit failed: \(error.localizedDescription)"
+    /// Files from the latest task that git still reports as changed: what the commit sheet offers.
+    public func commitCandidates() async -> [String] {
+        guard let taskID = currentTaskID else { return [] }
+        let root = workspace.root
+        let taskPaths = await checkpoints.changedPaths(taskID: taskID)
+        return await Task.detached(priority: .userInitiated) {
+            let git = GitService(root: root)
+            guard git.isRepository, let status = try? git.status(allUntrackedFiles: true) else { return [String]() }
+            let changed = Set(status.map(\.path))
+            return taskPaths.filter(changed.contains)
+        }.value
+    }
+
+    /// Commits exactly `paths` with `message`. Everything else in the working tree and the index,
+    /// including changes the user staged themselves, is left alone. Returns whether it worked.
+    public func commit(message: String, paths: [String]) async -> Bool {
+        let text = message.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !text.isEmpty, !paths.isEmpty else { return false }
+        let root = workspace.root
+        let failure: String? = await Task.detached(priority: .userInitiated) {
+            do {
+                try GitService(root: root).commit(message: text, paths: paths)
+                return nil
+            } catch {
+                return error.localizedDescription
+            }
+        }.value
+        if let failure {
+            lastError = "Commit failed: \(failure)"
+            return false
         }
+        let subject = text.split(whereSeparator: \.isNewline).first.map(String.init) ?? text
+        conversation.append(.note(id: UUID().uuidString,
+                                  text: "Committed \(paths.count) file\(paths.count == 1 ? "" : "s"): \(subject)"))
+        markReviewed(paths)
+        store.save(conversation)
+        return true
     }
 
     // MARK: Checkpoints (PRD §17)

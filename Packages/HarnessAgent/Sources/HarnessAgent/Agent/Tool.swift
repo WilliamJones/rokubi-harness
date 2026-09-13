@@ -86,6 +86,21 @@ public struct ToolContext: Sendable {
     func didMutate(_ url: URL) async {
         await sink.fileChanged(url)
     }
+
+    /// Captures the project before an action that can change many files at once (a command, a
+    /// folder rename or delete), so Undo Task can reverse whatever it changes.
+    func captureTree() async -> CheckpointStore.TreeCapture? {
+        await checkpoints?.captureTree(ignore: ignore)
+    }
+
+    /// Records what changed since `capture` as part of this task and tells the UI. Returns the paths.
+    @discardableResult
+    func recordChanges(since capture: CheckpointStore.TreeCapture?, label: String) async -> [String] {
+        guard let capture, let checkpoints else { return [] }
+        let paths = await checkpoints.recordChanges(since: capture, ignore: ignore, taskID: taskID, label: label)
+        for path in paths { await sink.fileChanged(files.root.appendingPathComponent(path)) }
+        return paths
+    }
 }
 
 /// A capability exposed to the model as a function tool.

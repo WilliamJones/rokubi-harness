@@ -42,7 +42,13 @@ User-facing overview: `README.md`.
 - All OpenAI/ChatGPT/OpenRouter constants live in `OpenAIEndpoints.swift`. The ChatGPT backend is undocumented —
   re-verify against `openai/codex` (`codex-rs/login`) if auth breaks.
 - The agent may only touch files through `FileService`; secrets (`.env`, `*.key`, …) are blocked
-  for agent reads. Every mutating tool checkpoints before writing.
+  for agent reads. Every mutating tool checkpoints before writing. `run_command` and folder rename/delete also
+  capture the project first (`CheckpointStore.captureTree` then `recordChanges`, honouring the agent ignore rules,
+  files up to 5 MB), so Undo Task and diff review cover what they change.
+- Closing a tab goes through `ProjectWorkspace.requestClose`, which asks Save / Don't Save / Cancel when the tab is
+  dirty. Only call `close` directly when discarding is intended (e.g. the file was trashed).
+- Commit goes through `CommitSheet` and `AgentSession.commit(message:paths:)`, which calls
+  `GitService.commit(message:paths:)`: it stages and commits only those paths, leaving the rest of the index alone.
 
 ## Testing the agent loop offline
 - `scripts/smoke.sh [--openrouter]` — the end-to-end check. Builds Debug, starts `scripts/mock-openai.py`,
@@ -76,4 +82,6 @@ User-facing overview: `README.md`.
   `run`/`packageInstall` classes use `CommandPattern` (`*` spans `/` and spaces); path classes use `Glob`.
   This is a backstop, not a sandbox — `run_command` goes through a login shell.
 - `.rokubi/permissions.json` ships with the repo, so a blanket `allow` (no `match`) for anything beyond
-  reads is ignored; scoped allows like `npm test*` work.
+  reads is skipped; scoped allows like `npm test*` work. `loadProjectRulesReport` checks each rule on its own:
+  a typo, unknown key, or wrong type skips just that rule, and the chat shows the warnings. An unknown key is never
+  read as "no match", which would widen the rule.

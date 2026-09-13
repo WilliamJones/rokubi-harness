@@ -107,6 +107,121 @@ public actor CheckpointStore {
         return last.path
     }
 
+    // MARK: Whole-project capture (commands, folder moves and deletes)
+
+    /// One file as it was when the project was captured.
+    public struct FileStamp: Sendable, Equatable {
+        public let size: Int
+        public let modified: Date
+        public let blob: String
+    }
+
+    /// The project's files before an action that can change many of them at once, such as a shell
+    /// command. `recordChanges(since:)` turns the difference into checkpoints, so Undo Task covers it.
+    public struct TreeCapture: Sendable {
+        public let files: [String: FileStamp]
+        /// Files that exist but weren't stored (too large, or past the limits); never reported as new.
+        public let uncaptured: Set<String>
+    }
+
+    public static let maxCapturedFileBytes = 5 * 1024 * 1024
+    public static let maxCapturedFiles = 20_000
+    public static let maxCapturedTotalBytes = 500 * 1024 * 1024
+
+    /// Stamps from earlier captures, so a repeat capture only reads files whose size or date changed.
+    private var stampCache: [String: FileStamp] = [:]
+
+    /// Stores every project file the agent can see (honouring `ignore`, so `node_modules` and build
+    /// output are skipped). Unchanged files cost a `stat`, because their content is already stored.
+    public func captureTree(ignore: IgnoreRules) -> TreeCapture {
+        var files: [String: FileStamp] = [:]
+        var uncaptured = Set<String>()
+        var total = 0
+        for file in walkFiles(ignore: ignore) {
+            guard file.size <= Self.maxCapturedFileBytes, files.count < Self.maxCapturedFiles,
+                  total + file.size <= Self.maxCapturedTotalBytes else {
+                uncaptured.insert(file.rel); continue
+            }
+            if let cached = stampCache[file.rel], cached.size == file.size, cached.modified == file.modified {
+                files[file.rel] = cached
+                total += file.size
+                continue
+            }
+            guard let data = try? Data(contentsOf: file.url), let blob = try? store(data) else {
+                uncaptured.insert(file.rel); continue
+            }
+            let stamp = FileStamp(size: file.size, modified: file.modified, blob: blob)
+            stampCache[file.rel] = stamp
+            files[file.rel] = stamp
+            total += file.size
+        }
+        return TreeCapture(files: files, uncaptured: uncaptured)
+    }
+
+    /// Compares the project with `capture` and records every file that changed, appeared, or
+    /// disappeared as part of the task, with its content from before. A file the task already touched
+    /// keeps its earlier original. Returns the recorded paths, sorted.
+    @discardableResult
+    public func recordChanges(since capture: TreeCapture, ignore: IgnoreRules, taskID: String, label: String?) -> [String] {
+        if manifests[taskID] == nil { beginTask(id: taskID) }
+        var current: [String: WalkedFile] = [:]
+        for file in walkFiles(ignore: ignore) { current[file.rel] = file }
+
+        var changed: [String] = []
+        let now = Date()
+        func record(_ rel: String, blob: String?) {
+            let snap = Snapshot(path: rel, blob: blob, takenAt: now, label: label)
+            if manifests[taskID]!.initial[rel] == nil { manifests[taskID]!.initial[rel] = snap }
+            manifests[taskID]!.history.append(snap)
+            changed.append(rel)
+        }
+        for (rel, before) in capture.files {
+            guard let now = current[rel] else { record(rel, blob: before.blob); continue }   // deleted
+            if now.size == before.size && now.modified == before.modified { continue }
+            guard let data = try? Data(contentsOf: now.url) else { continue }
+            if Self.sha256(data) != before.blob { record(rel, blob: before.blob) }
+        }
+        for rel in current.keys where capture.files[rel] == nil && !capture.uncaptured.contains(rel) {
+            record(rel, blob: nil)   // created
+        }
+        if !changed.isEmpty { persist(taskID) }
+        return changed.sorted()
+    }
+
+    private struct WalkedFile {
+        let rel: String
+        let url: URL
+        let size: Int
+        let modified: Date
+    }
+
+    private func walkFiles(ignore: IgnoreRules) -> [WalkedFile] {
+        let fm = FileManager.default
+        let keys: [URLResourceKey] = [.isDirectoryKey, .isSymbolicLinkKey, .fileSizeKey, .contentModificationDateKey]
+        let ownDirectory = directory.standardizedFileURL.path
+        var result: [WalkedFile] = []
+        var stack = [projectRoot]
+        while let dir = stack.popLast() {
+            guard let urls = try? fm.contentsOfDirectory(at: dir, includingPropertiesForKeys: keys) else { continue }
+            for url in urls {
+                guard url.lastPathComponent != ".git",
+                      !url.standardizedFileURL.path.hasPrefix(ownDirectory),
+                      let values = try? url.resourceValues(forKeys: Set(keys)),
+                      values.isSymbolicLink != true else { continue }
+                let rel = relative(url)
+                let isDirectory = values.isDirectory ?? false
+                if ignore.isIgnored(relativePath: rel, isDirectory: isDirectory) { continue }
+                if isDirectory {
+                    stack.append(url)
+                } else {
+                    result.append(WalkedFile(rel: rel, url: url, size: values.fileSize ?? 0,
+                                             modified: values.contentModificationDate ?? .distantPast))
+                }
+            }
+        }
+        return result
+    }
+
     // MARK: Private
 
     private func restore(_ snap: Snapshot) throws {
@@ -116,7 +231,22 @@ public actor CheckpointStore {
             try data.write(to: url, options: .atomic)
         } else if FileManager.default.fileExists(atPath: url.path) {
             try FileManager.default.removeItem(at: url)
+            removeEmptyParents(of: url)
         }
+    }
+
+    /// After removing a file the task created, removes folders it left empty (up to the project root).
+    private func removeEmptyParents(of url: URL) {
+        var dir = url.deletingLastPathComponent().standardizedFileURL
+        while dir.path.hasPrefix(projectRoot.path + "/"),
+              let contents = try? FileManager.default.contentsOfDirectory(atPath: dir.path), contents.isEmpty {
+            try? FileManager.default.removeItem(at: dir)
+            dir = dir.deletingLastPathComponent()
+        }
+    }
+
+    static func sha256(_ data: Data) -> String {
+        SHA256.hash(data: data).map { String(format: "%02x", $0) }.joined()
     }
 
     private func relative(_ url: URL) -> String {
@@ -125,7 +255,7 @@ public actor CheckpointStore {
     }
 
     private func store(_ data: Data) throws -> String {
-        let sha = SHA256.hash(data: data).map { String(format: "%02x", $0) }.joined()
+        let sha = Self.sha256(data)
         let url = directory.appendingPathComponent("blobs/\(sha)")
         if !FileManager.default.fileExists(atPath: url.path) { try data.write(to: url, options: .atomic) }
         return sha

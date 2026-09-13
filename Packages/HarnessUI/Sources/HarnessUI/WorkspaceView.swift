@@ -15,6 +15,8 @@ public struct WorkspaceView: View {
     @State private var composerPrefill: String?
     @State private var showReview = false
     @State private var showPalette = false
+    @State private var showCommit = false
+    @Environment(\.openWindow) private var openWindow
     @Environment(AuthSession.self) private var auth
     @Environment(ModelCatalog.self) private var models
 
@@ -31,7 +33,7 @@ public struct WorkspaceView: View {
             centerColumn
                 .frame(minWidth: 360, idealWidth: 760, maxWidth: .infinity)
                 .layoutPriority(1)
-            ChatPanelView(session: agent, editor: editor, prefill: $composerPrefill, showReview: $showReview)
+            ChatPanelView(session: agent, editor: editor, prefill: $composerPrefill, showReview: $showReview, showCommit: $showCommit)
                 .frame(minWidth: 300, idealWidth: 380, maxWidth: 640)
         }
         .overlay(alignment: .top) {
@@ -40,6 +42,7 @@ public struct WorkspaceView: View {
             }
         }
         .sheet(isPresented: $showReview) { DiffReviewView(session: agent) }
+        .sheet(isPresented: $showCommit) { CommitSheet(session: agent) }
         .onReceive(NotificationCenter.default.publisher(for: .harnessTogglePalette)) { _ in
             showPalette.toggle()
             // Refresh the skill listing here (an event handler), so `paletteCommands` in body
@@ -189,7 +192,11 @@ extension WorkspaceView {
     var paletteCommands: [HarnessCommand] {
         var c: [HarnessCommand] = [
             HarnessCommand(id: "open", title: "Open Folder…", systemImage: "folder") {
-                if let url = ProjectPicker.chooseFolder() { RecentProjects.shared.touch(.init(url: url)) }
+                if let url = ProjectPicker.chooseFolder() {
+                    let ref = ProjectRef(url: url)
+                    RecentProjects.shared.touch(ref)
+                    openWindow(value: ref)
+                }
             },
             HarnessCommand(id: "review", title: "Review Changes", subtitle: "\(agent.changedFiles.count) changed", systemImage: "arrow.triangle.branch") { showReview = true },
             HarnessCommand(id: "terminal", title: "Open Terminal", systemImage: "terminal") { workspace.requestTerminal() },
@@ -210,9 +217,8 @@ extension WorkspaceView {
             })
         }
         if agent.isGitRepository {
-            c.append(HarnessCommand(id: "commit", title: "Git Commit…", systemImage: "checkmark.seal") {
-                agent.commitChanges(agent.completion?.summary ?? "Update")
-            })
+            c.append(HarnessCommand(id: "commit", title: "Git Commit…", subtitle: "choose the message and files",
+                                    systemImage: "checkmark.seal") { showCommit = true })
         }
         return c
     }

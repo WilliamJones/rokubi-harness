@@ -112,7 +112,7 @@ struct CompletionCard: View {
             }
             HStack {
                 Button("Review Changes", action: onReview).disabled(!canReview || changedCount == 0)
-                Button("Commit", action: onCommit).disabled(!canCommit || changedCount == 0)
+                Button("Commit…", action: onCommit).disabled(!canCommit)
                 Spacer()
                 Button("Undo Task", role: .destructive, action: onUndo).disabled(changedCount == 0)
             }

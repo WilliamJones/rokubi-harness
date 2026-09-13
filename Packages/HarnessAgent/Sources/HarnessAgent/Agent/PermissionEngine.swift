@@ -122,12 +122,80 @@ public struct PermissionPolicy: Sendable, Equatable {
     /// (no `match`) for anything beyond reads is dropped — otherwise a cloned repo could grant
     /// itself unprompted shell access under Standard autonomy.
     public static func loadProjectRules(root: URL) -> [PermissionRule] {
+        loadProjectRulesReport(root: root).rules
+    }
+
+    /// Reads `.rokubi/permissions.json` one rule at a time. A rule with a mistake (unknown class or
+    /// decision, a misspelled key, a wrong type) is skipped and reported, and the other rules still
+    /// apply. A misspelled `match` key is never treated as "no match", which would widen the rule.
+    /// A blanket `allow` for anything beyond reads is skipped and reported too. A file that isn't a
+    /// JSON list applies no rules and says so.
+    public static func loadProjectRulesReport(root: URL) -> ProjectRulesLoad {
         let url = root.appendingPathComponent(".rokubi/permissions.json")
-        guard let data = try? Data(contentsOf: url) else { return [] }
-        let rules = (try? JSONDecoder().decode([PermissionRule].self, from: data)) ?? []
-        return rules.filter { rule in
-            !(rule.decision == .allow && rule.match == nil && ![.read, .search, .gitRead].contains(rule.permissionClass))
+        guard let data = try? Data(contentsOf: url) else { return ProjectRulesLoad(rules: [], warnings: []) }
+        guard let json = try? JSONSerialization.jsonObject(with: data) else {
+            return ProjectRulesLoad(rules: [], warnings: ["The file isn't valid JSON, so no project rules apply."])
         }
+        guard let entries = json as? [Any] else {
+            return ProjectRulesLoad(rules: [], warnings: ["The file must be a JSON list of rules, so no project rules apply."])
+        }
+        let classNames = PermissionClass.allCases.map(\.rawValue).joined(separator: ", ")
+        var rules: [PermissionRule] = []
+        var warnings: [String] = []
+        for (index, entry) in entries.enumerated() {
+            let n = index + 1
+            guard let object = entry as? [String: Any] else {
+                warnings.append("Rule \(n) isn't an object; skipped."); continue
+            }
+            let unknownKeys = object.keys.filter { !["class", "match", "decision"].contains($0) }.sorted()
+            if !unknownKeys.isEmpty {
+                let names = unknownKeys.map { "\"\($0)\"" }.joined(separator: ", ")
+                warnings.append("Rule \(n) has unknown key \(names); skipped. Keys are class, match, and decision."); continue
+            }
+            guard let className = object["class"] as? String else {
+                warnings.append("Rule \(n) needs a \"class\" written as text; skipped."); continue
+            }
+            guard let permissionClass = PermissionClass(rawValue: className) else {
+                warnings.append("Rule \(n) has unknown class \"\(className)\"; skipped. Use one of: \(classNames)."); continue
+            }
+            guard let decisionName = object["decision"] as? String else {
+                warnings.append("Rule \(n) needs a \"decision\" written as text; skipped."); continue
+            }
+            guard let decision = PermissionRule.Decision(rawValue: decisionName) else {
+                warnings.append("Rule \(n) has unknown decision \"\(decisionName)\"; skipped. Use allow, ask, or deny."); continue
+            }
+            var match: String? = nil
+            if let raw = object["match"], !(raw is NSNull) {
+                guard let text = raw as? String else {
+                    warnings.append("Rule \(n) has a \"match\" that isn't text; skipped."); continue
+                }
+                match = text
+            }
+            if decision == .allow, match == nil, ![.read, .search, .gitRead].contains(permissionClass) {
+                warnings.append("Rule \(n) allows every \"\(className)\" action with no \"match\"; skipped for safety. Add a match."); continue
+            }
+            rules.append(PermissionRule(permissionClass, match: match, decision))
+        }
+        return ProjectRulesLoad(rules: rules, warnings: warnings)
+    }
+}
+
+/// What `.rokubi/permissions.json` produced: the rules that apply, and why any were skipped.
+public struct ProjectRulesLoad: Sendable, Equatable {
+    public var rules: [PermissionRule]
+    public var warnings: [String]
+
+    public init(rules: [PermissionRule], warnings: [String]) {
+        self.rules = rules
+        self.warnings = warnings
+    }
+
+    /// One line for the chat's warning strip; empty when nothing was skipped.
+    public var summary: String {
+        guard !warnings.isEmpty else { return "" }
+        let shown = warnings.prefix(3).joined(separator: " ")
+        let more = warnings.count > 3 ? " (+\(warnings.count - 3) more)" : ""
+        return ".rokubi/permissions.json: \(shown)\(more)"
     }
 }
 

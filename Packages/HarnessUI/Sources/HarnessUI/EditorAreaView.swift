@@ -32,6 +32,19 @@ public struct EditorAreaView: View {
         }
         .onChange(of: editor.syncKey, initial: true) { _, _ in editor.sync() }
         .focusedSceneValue(\.editor, editor)
+        .alert("Do you want to save the changes to \(closingName)?",
+               isPresented: Binding(get: { workspace.closeRequest != nil },
+                                    set: { if !$0 { workspace.resolveClose(.cancel) } })) {
+            Button("Save") { workspace.resolveClose(.save) }
+            Button("Don't Save", role: .destructive) { workspace.resolveClose(.discard) }
+            Button("Cancel", role: .cancel) { workspace.resolveClose(.cancel) }
+        } message: {
+            Text("Your changes will be lost if you don't save them.")
+        }
+    }
+
+    private var closingName: String {
+        workspace.closeRequest.flatMap { id in workspace.documents.first { $0.id == id }?.name } ?? "this file"
     }
 }
 
@@ -44,7 +57,7 @@ private struct TabStrip: View {
                 ForEach(workspace.documents) { doc in
                     TabItem(doc: doc, isActive: doc.id == workspace.activeDocumentID,
                             activate: { workspace.activeDocumentID = doc.id },
-                            close: { workspace.close(doc.id) })
+                            close: { workspace.requestClose(doc.id) })
                 }
             }
         }

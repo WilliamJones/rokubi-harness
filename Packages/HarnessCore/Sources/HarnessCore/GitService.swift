@@ -38,8 +38,9 @@ public struct GitService: Sendable {
 
     /// Parses `git status --porcelain=v1 -z`. In `-z` mode a rename/copy is two NUL-separated
     /// fields (`R  new\0old\0`), so the old path has to be consumed explicitly.
-    public func status() throws -> [FileStatus] {
-        let r = try run(["status", "--porcelain=v1", "-z"])
+    /// `allUntrackedFiles` lists each new file instead of collapsing a new folder into `dir/`.
+    public func status(allUntrackedFiles: Bool = false) throws -> [FileStatus] {
+        let r = try run(["status", "--porcelain=v1", "-z"] + (allUntrackedFiles ? ["--untracked-files=all"] : []))
         guard r.exitCode == 0 else { return [] }
         var result: [FileStatus] = []
         let fields = r.output.split(separator: "\0", omittingEmptySubsequences: true).map(String.init)
@@ -89,6 +90,18 @@ public struct GitService: Sendable {
     @discardableResult
     public func commit(message: String) throws -> String {
         let r = try run(["commit", "-m", message])
+        guard r.exitCode == 0 else { throw GitError(r.error.isEmpty ? r.output : r.error) }
+        return r.output
+    }
+
+    /// Stages and commits exactly `paths` (modified, new, or deleted). Every other change in the
+    /// working tree or the index, including changes the user already staged, is left as it is.
+    @discardableResult
+    public func commit(message: String, paths: [String]) throws -> String {
+        guard !paths.isEmpty else { throw GitError("Nothing to commit") }
+        let add = try run(["add", "-A", "--"] + paths)
+        guard add.exitCode == 0 else { throw GitError(add.error.isEmpty ? add.output : add.error) }
+        let r = try run(["commit", "-m", message, "--only", "--"] + paths)
         guard r.exitCode == 0 else { throw GitError(r.error.isEmpty ? r.output : r.error) }
         return r.output
     }

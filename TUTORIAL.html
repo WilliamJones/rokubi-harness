@@ -494,7 +494,7 @@ security delete-generic-password -s com.rokubi.harness -a chatgpt.tokens</div>
       <h2>Open a project</h2>
       <p>A project is any normal folder. There's no import step.</p>
       <ul class="plain">
-        <li><strong>Open Folder…</strong> in the welcome window, or press <kbd>⌘O</kbd> any time.</li>
+        <li><strong>Open Folder…</strong> in the welcome window, <kbd>⌘O</kbd> any time, or <strong>Open Folder…</strong> in the command palette.</li>
         <li>Drag a folder onto the welcome window.</li>
         <li>Click a project under <strong>Recent</strong>. Right-click one to <strong>Remove from Recents</strong>. The list keeps the last 12.</li>
         <li><strong>File › Open Recent</strong> lists the same projects, with <strong>Clear Menu</strong> at the bottom.</li>
@@ -504,10 +504,6 @@ security delete-generic-password -s com.rokubi.harness -a chatgpt.tokens</div>
         <p class="where"><b>Terminal</b> open a project, or a project and a file, from the command line</p>
         <div class="codeblock">open -n /Applications/RokubiHarness.app --args --project ~/code/my-app
 open -n /Applications/RokubiHarness.app --args --project ~/code/my-app --open src/index.ts</div>
-      </div>
-      <div class="note warn">
-        <span class="tag">Known issue</span>
-        <p><strong>Open Folder…</strong> in the command palette only adds the folder to Recent. Use <kbd>⌘O</kbd> to open it.</p>
       </div>
     </section>
 
@@ -613,9 +609,9 @@ cd .. &amp;&amp; git checkout -- demo-project</div>
         <li><strong>Multiple cursors:</strong> hold <kbd>⌥</kbd> and click.</li>
         <li><strong>Every Monaco command:</strong> press <kbd>⇧⌘P</kbd> inside the editor.</li>
       </ul>
-      <div class="note warn">
-        <span class="tag">Save before closing</span>
-        <p>Closing a tab doesn't ask to save. Unsaved edits in that tab are lost. Press <kbd>⌘S</kbd> first.</p>
+      <div class="note">
+        <span class="tag">Closing with unsaved edits</span>
+        <p>Closing a tab that has unsaved edits, with its close button or <kbd>⌘W</kbd>, asks whether to <strong>Save</strong>, <strong>Don't Save</strong>, or <strong>Cancel</strong>. Closing the whole project window doesn't ask yet, so save before you close a window.</p>
       </div>
       <div class="tablewrap"><table class="ref">
         <tr><th>Keys</th><th>Editor menu command</th></tr>
@@ -904,7 +900,7 @@ test/cart.test.js:16: fixed discount comes off the order once
       <div class="tablewrap"><table class="ref">
         <tr><th>Button</th><th>What it does</th><th>Disabled when</th></tr>
         <tr><td>Review Changes</td><td>Opens the <a href="#changes">diff review</a>.</td><td>No files changed</td></tr>
-        <tr><td>Commit</td><td>Stages <em>everything</em> and commits. See <a href="#git">Git</a>.</td><td>Not a git repository, or no files changed</td></tr>
+        <tr><td>Commit…</td><td>Opens a sheet where you edit the message and choose which of the task's files to commit. See <a href="#git">Git</a>.</td><td>Not a git repository</td></tr>
         <tr><td>Undo Task</td><td>Restores every file the task touched. See <a href="#checkpoints">Checkpoints</a>.</td><td>No files changed</td></tr>
       </table></div>
     </section>
@@ -912,7 +908,7 @@ test/cart.test.js:16: fixed discount comes off the order once
     <section id="changes">
       <div class="grouphead"><span class="gnum">18.</span><span class="glabel">Review and undo</span></div>
       <h2>Reviewing changes</h2>
-      <p>Open the review from the <strong>Review</strong> chip, <strong>Review Changes</strong> on the completion card, or the command palette. Changed files are listed on the left. Each file shows side by side: the version from before the task on the left, and the current file on the right.</p>
+      <p>Open the review from the <strong>Review</strong> chip, <strong>Review Changes</strong> on the completion card, or the command palette. Changed files are listed on the left, including files changed by commands the agent ran. Each file shows side by side: the version from before the task on the left, and the current file on the right.</p>
       <div class="tablewrap"><table class="ref">
         <tr><th>Control</th><th>What it does</th></tr>
         <tr><td>Accept File</td><td>Keep this file's changes, remove it from the list, and go to the next file.</td></tr>
@@ -929,7 +925,7 @@ test/cart.test.js:16: fixed discount comes off the order once
     <section id="checkpoints">
       <div class="grouphead"><span class="gnum">19.</span><span class="glabel">Review and undo</span></div>
       <h2>Checkpoints and undo</h2>
-      <p>One message you send is one task. Before the agent edits, creates, renames, or deletes a file, the app saves a copy. This works even in folders that aren't git repositories.</p>
+      <p>One message you send is one task. Before the agent edits, creates, renames, or deletes a file, the app saves a copy. It also takes a snapshot of the project before every command the agent runs and before it renames or deletes a folder, so those changes can be undone too. This works even in folders that aren't git repositories.</p>
       <dl class="pairs">
         <dt>Undo Task</dt><dd>Restores every file the task touched and removes files it created. Find it on the completion card, in the command palette, or as <strong>Reject All</strong> in the review.</dd>
         <dt>Reject File</dt><dd>Restores one file, from the review.</dd>
@@ -937,7 +933,7 @@ test/cart.test.js:16: fixed discount comes off the order once
       </dl>
       <div class="note warn">
         <span class="tag">What undo can't bring back</span>
-        <p>Changes made by commands the agent ran, like <code>npm install</code> or a code formatter. Folder renames and deletes. Your own edits. Undo works only for the latest task in the window, and switching conversations clears it. Files the agent deleted also sit in the Finder Trash.</p>
+        <p>Files in folders the agent skips, like <code>node_modules</code>, <code>dist</code>, or anything in your <code>.gitignore</code>, so undo won't remove packages a command installed there. Files larger than 5 MB. Your own edits. Undo works only for the latest task in the window, and switching conversations clears it. Files the agent deleted also sit in the Finder Trash.</p>
       </div>
       <p>For big tasks, give yourself a git safety net first.</p>
       <div class="snip">
@@ -955,13 +951,13 @@ git stash list              <span class="c"># bring it back later with: git stas
       <div class="grouphead"><span class="gnum">20.</span><span class="glabel">Review and undo</span></div>
       <h2>Git</h2>
       <p>The agent's git tools can read <code>git status</code>, <code>git diff</code>, and <code>git log</code>. Anything else, like committing, has to go through a terminal command, which your autonomy setting controls. Force pushes are always blocked. The app doesn't show the current branch.</p>
-      <div class="note warn">
-        <span class="tag">Commit stages everything</span>
-        <p><strong>Commit</strong> on the completion card, and <strong>Git Commit…</strong> in the palette, run <code>git add -A</code>. That includes your own unrelated changes. The commit message is the first line of the task summary. There's no confirmation step.</p>
+      <div class="note">
+        <span class="tag">Committing a task</span>
+        <p><strong>Commit…</strong> on the completion card, or <strong>Git Commit…</strong> in the palette, opens a sheet. It starts with the first line of the task summary as the message and lists the files the task changed, all ticked. Edit the message, untick anything you want to leave out, and click <strong>Commit</strong>. Only the ticked files are staged and committed. Your other changes, staged or not, stay as they are.</p>
       </div>
       <div class="snip"><p class="where"><b>Chat</b></p><div class="codeblock prompt">Look at git status and git diff, then write a short commit message for these changes. Don't commit.</div></div>
       <div class="snip">
-        <p class="where"><b>Terminal</b> commit only the files you choose</p>
+        <p class="where"><b>Terminal</b> or commit by hand</p>
         <div class="codeblock">git status
 git add src/cart.js test/cart.test.js
 git commit -m "Apply the discount once per order"</div>
@@ -998,9 +994,9 @@ git commit -m "Apply the discount once per order"</div>
         <li><strong>No match</strong> means the rule covers every action in that class.</li>
         <li><strong>Order:</strong> the always-blocked list, then this task's Always Allow answers, then this file, then your autonomy setting. Inside the file, the <em>last</em> matching rule wins.</li>
       </ul>
-      <div class="note warn">
-        <span class="tag">Silently ignored</span>
-        <p>A rule that says <code>allow</code> with no <code>match</code> is dropped for anything beyond reading and searching, so a cloned repository can't give itself free rein. And if <em>any</em> rule has a typo, like <code>"Run"</code> instead of <code>"run"</code>, the whole file is ignored.</p>
+      <div class="note">
+        <span class="tag">Mistakes are reported</span>
+        <p>When you send a message, any rule that can't be used is skipped and named in a warning above the chat box. The other rules still apply. That covers a typo like <code>"Run"</code> instead of <code>"run"</code>, a misspelled key like <code>"matches"</code>, and an <code>allow</code> with no <code>match</code> for anything beyond reading and searching. That last one is skipped on purpose, so a cloned repository can't give itself free rein. If the file isn't valid JSON, no project rules apply and the warning says so.</p>
       </div>
       <div class="snip">
         <p class="where"><b>Terminal</b> Node project: run tests, lint, and type-check without asking</p>
@@ -1099,7 +1095,7 @@ EOF</div>
       <p>Press <kbd>⌘K</kbd>. Type to filter, use <kbd>↑</kbd> <kbd>↓</kbd> to move, <kbd>Return</kbd> to run, and <kbd>Esc</kbd> to close.</p>
       <div class="tablewrap"><table class="ref">
         <tr><th>Command</th><th>What it does</th></tr>
-        <tr><td>Open Folder…</td><td>Adds a folder to Recent. Use <kbd>⌘O</kbd> to actually open it.</td></tr>
+        <tr><td>Open Folder…</td><td>Opens a folder in a new window.</td></tr>
         <tr><td>Review Changes</td><td>Opens the diff review.</td></tr>
         <tr><td>Open Terminal</td><td>Opens a new shell.</td></tr>
         <tr><td>Format File</td><td>Formats the open file.</td></tr>
@@ -1109,7 +1105,7 @@ EOF</div>
         <tr><td>Undo Task</td><td>Restores files to the start of the last task.</td></tr>
         <tr><td>Change Model: <em>name</em></td><td>Switches model. The first 40 models are listed.</td></tr>
         <tr><td>/<em>skill</em></td><td>Puts <code>/skill </code> in the chat box.</td></tr>
-        <tr><td>Git Commit…</td><td>In git repositories only. Stages everything and commits with the last summary.</td></tr>
+        <tr><td>Git Commit…</td><td>In git repositories only. Opens the commit sheet for the last task's files.</td></tr>
       </table></div>
     </section>
 
@@ -1123,7 +1119,7 @@ EOF</div>
         <tr><td><kbd>⌃`</kbd></td><td>New terminal</td><td>Project window</td></tr>
         <tr><td><kbd>⌘S</kbd></td><td>Save</td><td>Editor</td></tr>
         <tr><td><kbd>⌥⌘S</kbd></td><td>Save all</td><td>Editor</td></tr>
-        <tr><td><kbd>⌘W</kbd></td><td>Close editor tab, without a save prompt</td><td>Editor</td></tr>
+        <tr><td><kbd>⌘W</kbd></td><td>Close editor tab, asking to save unsaved edits</td><td>Editor</td></tr>
         <tr><td><kbd>⌘F</kbd></td><td>Find</td><td>Editor</td></tr>
         <tr><td><kbd>⌥⌘F</kbd></td><td>Find and replace</td><td>Editor</td></tr>
         <tr><td><kbd>⌘L</kbd></td><td>Go to line</td><td>Editor</td></tr>
@@ -1179,13 +1175,12 @@ defaults read com.rokubi.harness                                    <span class=
         <tr><td>"The ChatGPT account has no account id; is a workspace selected?"</td><td>Choose a workspace in ChatGPT, then sign in again.</td></tr>
         <tr><td>An error on the first message after pasting a key</td><td>The key is wrong. Open ••• › Sign Out and connect again.</td></tr>
         <tr><td>A command "timed out"</td><td>Ask for a longer timeout, up to 900 seconds, or run it yourself in Terminal.app.</td></tr>
-        <tr><td>My permission rules do nothing</td><td>Check the JSON is valid and every <code>class</code> is spelled exactly. A blanket <code>allow</code> is ignored. Paths are relative to the project.</td></tr>
+        <tr><td>A permission rule doesn't seem to apply</td><td>Look for a warning above the chat box after you send a message. It names each skipped rule and why. Fix that rule; the others still apply. Paths are relative to the project.</td></tr>
         <tr><td>No Problems chip</td><td>Only commands the agent runs are scanned, and only in the formats listed under <a href="#problems">Problems</a>.</td></tr>
         <tr><td><code>@file</code> attached nothing</td><td>The path must match exactly, relative to the project. Secret files are skipped.</td></tr>
         <tr><td>A new skill doesn't show up</td><td>It must be a <code>.md</code> file directly inside the skills folder, with no spaces in its name. Open <kbd>⌘K</kbd> to refresh.</td></tr>
-        <tr><td>Undo Task didn't restore something</td><td>Undo doesn't cover changes made by commands. Use git; see <a href="#checkpoints">Checkpoints</a>.</td></tr>
-        <tr><td>My unsaved edits vanished</td><td>Closing a tab doesn't ask to save. Save with <kbd>⌘S</kbd> before closing.</td></tr>
-        <tr><td>Open Folder… in the palette doesn't open anything</td><td>Known issue. Use <kbd>⌘O</kbd>.</td></tr>
+        <tr><td>Undo Task didn't restore something</td><td>Undo skips folders the agent ignores, like <code>node_modules</code>, and files over 5 MB. Use git for those; see <a href="#checkpoints">Checkpoints</a>.</td></tr>
+        <tr><td>My unsaved edits vanished</td><td>Closing a tab asks to save, but closing a whole project window doesn't yet. Save with <kbd>⌘S</kbd> before closing a window.</td></tr>
       </table></div>
       <div class="snip">
         <p class="where"><b>Terminal</b> see what's using the sign-in port</p>

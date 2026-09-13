@@ -82,11 +82,38 @@ public final class ProjectWorkspace {
         }
     }
 
+    /// Closes a tab immediately, discarding unsaved edits. User-facing close goes through `requestClose`.
     public func close(_ id: UUID) {
         guard let index = documents.firstIndex(where: { $0.id == id }) else { return }
         documents.remove(at: index)
         if activeDocumentID == id {
             activeDocumentID = documents.indices.contains(index) ? documents[index].id : documents.last?.id
+        }
+    }
+
+    public enum CloseChoice: Sendable { case save, discard, cancel }
+
+    /// A tab the user asked to close while it had unsaved edits. The window asks Save / Don't Save / Cancel.
+    public var closeRequest: UUID?
+
+    /// Closes the tab, or asks first when it has unsaved edits.
+    public func requestClose(_ id: UUID) {
+        guard let doc = documents.first(where: { $0.id == id }) else { return }
+        if doc.isDirty { closeRequest = id } else { close(id) }
+    }
+
+    /// Answers the pending close request. A save that fails keeps the tab open.
+    public func resolveClose(_ choice: CloseChoice) {
+        guard let id = closeRequest else { return }
+        closeRequest = nil
+        switch choice {
+        case .cancel:
+            return
+        case .discard:
+            close(id)
+        case .save:
+            save(id)
+            if documents.first(where: { $0.id == id })?.isDirty == false { close(id) }
         }
     }
 
