@@ -316,7 +316,7 @@ test at test/cart.test.js:15:1
     <li><div><b>Open the demo project.</b> Build and launch the app from your clone with <code>scripts/bootstrap.sh</code> (once) and <code>scripts/run.sh</code>, press <kbd>⌘O</kbd>, and choose <code>demo-project</code>. It ships broken on purpose.
       <div class="cmd"><span class="c"># confirm the bug is there first</span>
 cd demo-project && npm test   <span class="c"># → 4 pass, 1 fail</span></div></div></li>
-    <li><div><b>Pick a model that can drive tools.</b> Click the model name in the title bar and search. <code>anthropic/claude-sonnet-*</code> or <code>openai/gpt-5*</code> are reliable; free <code>flash</code>/<code>mini</code>/<code>XS</code> tiers will just chat at you and never run anything.</div></li>
+    <li><div><b>Pick a model that can drive tools.</b> Click <b>Choose Model</b> in the toolbar and search. Your choice is remembered next time. <code>anthropic/claude-sonnet-*</code> or <code>openai/gpt-5*</code> are reliable; free <code>flash</code>/<code>mini</code>/<code>XS</code> tiers will just chat at you and never run anything.</div></li>
     <li><div><b>Set Autonomy to Full Autonomy</b> so it can run the tests without stopping to ask.</div></li>
     <li><div><b>Type four words:</b> <code>Fix the failing test.</code> then <kbd>⌘↩</kbd>. Don’t tell it which file — finding that out is its job.</div></li>
     <li><div><b>Watch, then check.</b> When the receipt appears, hit <b>Review Changes</b> for the diff, then <b>Undo Task</b> — and run <code>npm test</code> again to see the failure return.</div></li>

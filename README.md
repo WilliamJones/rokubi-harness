@@ -56,7 +56,8 @@ The Xcode project is generated from `project.yml` and is not checked in.
 
 1. Confirm the bug: `cd demo-project && npm test` shows 4 passing and 1 failing.
 2. Launch the app, press `⌘O`, and open `demo-project`.
-3. Pick a model that can call tools, and set **Autonomy** to **Full Autonomy**.
+3. Click **Choose Model** in the toolbar and pick a model that can call tools. Each sign-in method remembers its own choice.
+   Then set **Autonomy** to **Full Autonomy**.
 4. Send `Fix the failing test.` When the receipt appears, click **Review Changes**, then **Undo Task**,
    and run `npm test` again to watch the failure come back.
 

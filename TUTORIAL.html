@@ -475,7 +475,9 @@ open /Applications/RokubiHarness.app</div>
       </ol>
       <h3>Choose a model</h3>
       <p>Click the model name in the middle of the toolbar. Type to search by name or id. Each row shows the context size and the price per million tokens. Click <strong>Refresh</strong> to reload the list.</p>
-      <p>Pick a model that can call tools. Search for <code>claude-sonnet</code> or <code>gpt-5</code>. Small free models often just chat and never run anything. If the list can't load, you get <code>gpt-5.4</code>, <code>gpt-5.4-mini</code>, <code>gpt-5.3-codex</code>, and <code>gpt-5.2</code>.</p>
+      <p>Nothing is selected until you choose. The toolbar says <strong>Choose Model</strong> and the chat box waits until you pick one. After that, your choice is saved and comes back every time you open the app. Refreshing the list never changes it.</p>
+      <p>Each way of signing in keeps its own choice. A model you pick while connected to OpenRouter stays with OpenRouter, and ChatGPT sign-in and the OpenAI API key each remember theirs. When you switch, you get that account's model back, or <strong>Choose Model</strong> if you haven't picked one for it yet. The model button is greyed out while you're signed out.</p>
+      <p>Pick a model that can call tools. Search for <code>claude-sonnet</code> or <code>gpt-5</code>. Small free models often just chat and never run anything. If the list can't load, the picker offers <code>gpt-5.4</code>, <code>gpt-5.4-mini</code>, <code>gpt-5.3-codex</code>, and <code>gpt-5.2</code>.</p>
       <h3>Sign out</h3>
       <p>Open the <strong>•••</strong> menu and choose <strong>Sign Out</strong>. This removes only the account you're using. If another key is still saved, the app may use it next time. To remove every saved key, quit the app and run this.</p>
       <div class="snip">
@@ -520,7 +522,7 @@ npm test                    <span class="c"># 4 pass, 1 fail</span></div>
       </div>
       <ol class="howto">
         <li>Press <kbd>⌘O</kbd> and choose the <code>demo-project</code> folder.</li>
-        <li>Pick a model that can call tools.</li>
+        <li>Click <strong>Choose Model</strong> in the toolbar and pick a model that can call tools.</li>
         <li>In the chat header, set <strong>Autonomy</strong> to <strong>Full Autonomy</strong> so it can run the tests without asking.</li>
         <li>Paste this into the chat box and press <kbd>Return</kbd>.</li>
       </ol>
@@ -575,7 +577,7 @@ cd .. &amp;&amp; git checkout -- demo-project</div>
 
       <dl class="pairs">
         <dt>Title</dt><dd>The project name, with the open file's path underneath.</dd>
-        <dt>Model name</dt><dd>Click to search and switch models.</dd>
+        <dt>Model name</dt><dd>Click to search and switch models. It reads <strong>Choose Model</strong> until you pick one.</dd>
         <dt>••• menu</dt><dd>Your account, <strong>Sign Out</strong> or <strong>Sign in with ChatGPT…</strong>, <strong>New Terminal</strong>, <strong>Reveal Project in Finder</strong>, and <strong>Reload File Tree</strong>.</dd>
       </dl>
       <p>Everything else appears only when a task needs it: the terminal drawer, the Problems chip, the plan, the changes counter, approval requests, and the completion card. There's no Settings window. Settings live in menus and in project files.</p>
@@ -1149,7 +1151,7 @@ EOF</div>
         <tr><td>Conversations</td><td><code>~/Library/Application Support/ROKUBI Harness/projects/&lt;id&gt;/conversations/</code></td></tr>
         <tr><td>Undo checkpoints</td><td><code>~/Library/Application Support/ROKUBI Harness/projects/&lt;id&gt;/checkpoints/</code></td></tr>
         <tr><td>Keys and tokens</td><td>Keychain, service <code>com.rokubi.harness</code></td></tr>
-        <tr><td>Autonomy, model, account, recent projects</td><td>App preferences, domain <code>com.rokubi.harness</code></td></tr>
+        <tr><td>Autonomy, model choice for each account type, account, recent projects</td><td>App preferences, domain <code>com.rokubi.harness</code></td></tr>
       </table></div>
       <p>Each project gets its own folder under <code>projects</code>, named from its path. Checkpoints are never cleaned up automatically. Quit the app before changing any of these.</p>
       <div class="snip">
@@ -1169,6 +1171,8 @@ defaults read com.rokubi.harness                                    <span class=
       <h2>Troubleshooting</h2>
       <div class="tablewrap"><table class="ref">
         <tr><th>Problem</th><th>Fix</th></tr>
+        <tr><td>The chat box says "Choose a model in the toolbar to start"</td><td>No model is picked yet for this account. Click <strong>Choose Model</strong> in the toolbar and choose one. It's remembered after that.</td></tr>
+        <tr><td>My model changed after I switched accounts</td><td>Each way of signing in remembers its own model. Pick one once for the new account; switching back brings the old one back.</td></tr>
         <tr><td>The agent just chats and never runs anything</td><td>The model can't call tools well. Pick a stronger one and send the same message again.</td></tr>
         <tr><td>A Keychain prompt after every rebuild</td><td>Expected for locally signed builds. Click Always Allow.</td></tr>
         <tr><td>"Port 1455 is already in use"</td><td>Another sign-in window is open. Close it, or find what's using the port with the command below.</td></tr>
@@ -1213,7 +1217,7 @@ SMOKE_SKIP_BUILD=1 scripts/smoke.sh --openrouter    <span class="c"># reuse the 
         <div class="codeblock">cp -R demo-project /tmp/demo
 python3 scripts/mock-openai.py 8765 &amp;
 open -n DerivedData/Build/Products/Debug/RokubiHarness.app --args \
-  --project /tmp/demo --base-url http://127.0.0.1:8765 --api-key test \
+  --project /tmp/demo --base-url http://127.0.0.1:8765 --api-key test --model gpt-5.4 \
   --prompt "Fix the failing test"</div>
       </div>
       <div class="tablewrap"><table class="ref">
@@ -1221,7 +1225,8 @@ open -n DerivedData/Build/Products/Debug/RokubiHarness.app --args \
         <tr><td><code>--project &lt;dir&gt;</code>, <code>--open &lt;file&gt;</code></td><td>Open a folder, and a file in it.</td><td>All</td></tr>
         <tr><td><code>--api-key</code>, <code>--openrouter-key</code></td><td>Use a key without touching the Keychain.</td><td>Debug</td></tr>
         <tr><td><code>--base-url &lt;url&gt;</code></td><td>Point the app at a mock server.</td><td>Debug</td></tr>
-        <tr><td><code>--prompt "&lt;text&gt;"</code></td><td>Send one message automatically.</td><td>Debug</td></tr>
+        <tr><td><code>--model &lt;id&gt;</code></td><td>Use this model for the run without saving it as your choice.</td><td>Debug</td></tr>
+        <tr><td><code>--prompt "&lt;text&gt;"</code></td><td>Send one message automatically. Needs a chosen model, or <code>--model</code>.</td><td>Debug</td></tr>
         <tr><td><code>--snapshot &lt;png&gt;</code>, <code>--snapshot-delay=&lt;s&gt;</code>, <code>--quit-after-snapshot</code></td><td>Save a picture of the window, then optionally quit.</td><td>Debug</td></tr>
       </table></div>
     </section>

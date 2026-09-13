@@ -189,9 +189,11 @@ public struct ChatPanelView: View {
 
     private var emptyState: some View {
         VStack(spacing: 8) {
-            Text("Give \(assistantName) a goal.")
+            Text(models.selected == nil ? "Choose a model to start." : "Give \(assistantName) a goal.")
                 .font(.headline)
-            Text("It will search, read, edit, run and verify — and show you the evidence. Reference files with @.")
+            Text(models.selected == nil
+                 ? "Click Choose Model in the toolbar and pick one. Your choice is remembered next time."
+                 : "It will search, read, edit, run and verify — and show you the evidence. Reference files with @.")
                 .font(.callout).foregroundStyle(.secondary).multilineTextAlignment(.center)
         }
         .frame(maxWidth: .infinity)
@@ -230,7 +232,10 @@ public struct ChatPanelView: View {
                 }
                 .padding(.bottom, 4)
             }
-            TextField("Ask \(assistantName) to build, fix, explain…  (/ for skills, @ for context)", text: $draft, axis: .vertical)
+            TextField(models.selected == nil
+                      ? "Choose a model in the toolbar to start…"
+                      : "Ask \(assistantName) to build, fix, explain…  (/ for skills, @ for context)",
+                      text: $draft, axis: .vertical)
                 .textFieldStyle(.plain)
                 .lineLimit(1...10)
                 .font(.body)
@@ -255,7 +260,7 @@ public struct ChatPanelView: View {
                 } else {
                     Button(action: send) { Image(systemName: "arrow.up.circle.fill").font(.title2) }
                         .buttonStyle(.plain)
-                        .disabled(draft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                        .disabled(draft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || models.selected == nil)
                         .keyboardShortcut(.return, modifiers: .command)
                 }
             }
@@ -352,9 +357,14 @@ public struct ChatPanelView: View {
     }
 
     private func send() {
+        // No model until the user picks one; keep the draft so nothing typed is lost.
+        guard let model = models.selected else {
+            session.lastError = "Choose a model first: click Choose Model in the toolbar."
+            return
+        }
         suggestions = []
         let (text, attachments) = ContextResolver(workspace: session.workspace, editor: editor, session: session).resolve(draft)
-        session.send(text, attachments: attachments, auth: auth, model: models.selected)
+        session.send(text, attachments: attachments, auth: auth, model: model)
         draft = ""
     }
 

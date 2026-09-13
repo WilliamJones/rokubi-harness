@@ -76,8 +76,11 @@ public struct WorkspaceView: View {
             editor.problems = new
             if new.isEmpty { problemsExpanded = false }
         }
-        .onChange(of: auth.isSignedIn, initial: true) { _, signedIn in
-            if signedIn, let provider = auth.provider { Task { await models.refresh(using: provider) } }
+        // Each account type has its own saved model choice and its own model list, so follow the
+        // account itself, not just whether someone is signed in.
+        .onChange(of: auth.account?.mode, initial: true) { _, mode in
+            models.setAccount(mode)
+            if mode != nil, let provider = auth.provider { Task { await models.refresh(using: provider) } }
         }
         .alert("Something went wrong", isPresented: $showError, presenting: workspace.lastError) { _ in
             Button("OK") { workspace.lastError = nil }
@@ -138,13 +141,16 @@ private struct ModelPicker: View {
     var body: some View {
         Button { showPicker = true } label: {
             HStack(spacing: 4) {
-                Text(models.selectedInfo?.name ?? models.selected).font(.callout).lineLimit(1)
+                Text(models.selectedInfo?.name ?? models.selected ?? "Choose Model").font(.callout).lineLimit(1)
                 Image(systemName: "chevron.up.chevron.down").font(.system(size: 9)).foregroundStyle(.secondary)
             }
-            .foregroundStyle(auth.isSignedIn ? .primary : .secondary)
+            .foregroundStyle(!auth.isSignedIn ? AnyShapeStyle(.secondary)
+                             : models.selected == nil ? AnyShapeStyle(Color.accentColor) : AnyShapeStyle(.primary))
         }
         .buttonStyle(.plain)
-        .help("Model — click to search")
+        .disabled(!auth.isSignedIn)   // a choice is saved per account, so there must be one
+        .help(!auth.isSignedIn ? "Sign in to choose a model"
+              : models.selected == nil ? "Choose a model to start" : "Model — click to search")
         .popover(isPresented: $showPicker, arrowEdge: .bottom) {
             ModelSearchView(isPresented: $showPicker)
                 .frame(width: 380, height: 420)
@@ -196,7 +202,7 @@ extension WorkspaceView {
         // Cap the palette at a sensible number; the searchable picker handles the full catalog.
         for model in models.models.prefix(40) {
             c.append(HarnessCommand(id: "model:\(model.id)", title: "Change Model: \(model.name)",
-                                    subtitle: model.subtitle, systemImage: "cpu") { models.selected = model.id })
+                                    subtitle: model.subtitle, systemImage: "cpu") { models.select(model.id) })
         }
         for skill in agent.skills.all() {   // cached in SkillStore; refreshed on palette open
             c.append(HarnessCommand(id: "skill:\(skill.id)", title: "/\(skill.name)", subtitle: skill.description, systemImage: "wand.and.stars") {

@@ -35,6 +35,10 @@ User-facing overview: `README.md`.
 - Providers declare `api: ModelAPIStyle`; `AgentSession` picks `ResponsesClient` (OpenAI) or
   `ChatCompletionsClient` (OpenRouter / any OpenAI-compatible endpoint) per turn. Both normalize to
   `ResponseStreamEvent`, so the orchestrator never sees the difference.
+- The app never picks a model. `ModelCatalog.selected` is nil until the user chooses one. Each account type keeps its own
+  choice under `model.userSelected.<chatGPT|apiKey|openRouter>`. `WorkspaceView` calls `setAccount` whenever the account
+  changes, which restores that choice (and resets the model list) without writing anything; only `select(_:)` saves.
+  A refresh never replaces the choice, and the composer won't send without one.
 - All OpenAI/ChatGPT/OpenRouter constants live in `OpenAIEndpoints.swift`. The ChatGPT backend is undocumented —
   re-verify against `openai/codex` (`codex-rs/login`) if auth breaks.
 - The agent may only touch files through `FileService`; secrets (`.env`, `*.key`, …) are blocked
@@ -48,10 +52,12 @@ User-facing overview: `README.md`.
 - `scripts/mock-openai.py` is the scripted Responses API mock (also serves `/chat/completions` for OpenRouter mode).
   Its patch replaces `total()` verbatim, and `DEMO.html` shows that same code, so keep `demo-project/src/cart.js`
   byte-identical to `BUGGY_TOTAL` in the mock. If `npm test` passes in `demo-project`, the smoke test aborts.
-- Manual: `open -n DerivedData/Build/Products/Debug/RokubiHarness.app --args --project <dir> --base-url http://127.0.0.1:8765 --api-key test --prompt "…"`.
+- Manual: `open -n DerivedData/Build/Products/Debug/RokubiHarness.app --args --project <dir> --base-url http://127.0.0.1:8765 --api-key test --model gpt-5.4 --prompt "…"`.
   Launch through `open -n`, not the raw binary: from a non-interactive shell the raw binary may never get a window.
-- Debug-only flags: `--open <file>`, `--snapshot <png>` (+ `--snapshot-delay=<s>`, `--quit-after-snapshot`),
-  `--base-url`, `--api-key`, `--openrouter-key`. `--api-key`/`--openrouter-key` skip the Keychain entirely.
+- Flags in every build: `--project <dir>`, `--open <file>`.
+- Debug-only flags: `--snapshot <png>` (+ `--snapshot-delay=<s>`, `--quit-after-snapshot`), `--base-url`, `--api-key`,
+  `--openrouter-key`, `--model <id>`, `--prompt`. `--api-key`/`--openrouter-key` skip the Keychain entirely. `--model`
+  sets the model for that run without saving it; `--prompt` sends nothing unless a model is chosen or passed.
 - Builds are ad-hoc signed, so every rebuild is a "new" app to the Keychain: the first launch of a fresh build
   that restores a stored key shows a Keychain access prompt (or, from a sandboxed/headless shell, blocks in
   `SecItemCopyMatching` in the background restore task). Expected; it's why smoke runs pass keys via flags.

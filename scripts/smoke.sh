@@ -46,7 +46,7 @@ curl -fs "http://127.0.0.1:$PORT/models" >/dev/null || { echo "smoke: mock did n
 
 rm -f "$SNAP" "$SNAP.log"
 launch() {
-  open -n "$APP" --args --project "$WORK/demo" --base-url "http://127.0.0.1:$PORT" "${AUTH[@]}" \
+  open -n "$APP" --args --project "$WORK/demo" --base-url "http://127.0.0.1:$PORT" "${AUTH[@]}" --model gpt-5.4 \
     --prompt "Fix the failing cart test" --snapshot "$SNAP" --snapshot-delay="$DELAY" --quit-after-snapshot
 }
 launch
@@ -56,8 +56,9 @@ if ! pgrep -xq RokubiHarness; then echo "smoke: app did not start, retrying laun
 
 for _ in $(seq 1 $((DELAY * 4 + 60))); do [ -f "$SNAP" ] && break; sleep 0.5; done
 # Give the app a moment to quit on its own; then make sure it's gone.
-for _ in $(seq 1 20); do pgrep -xq RokubiHarness || break; sleep 0.25; done
-pkill -x RokubiHarness 2>/dev/null || true
+# Only ever stop the instance this script launched (matched by its temp project path).
+for _ in $(seq 1 20); do pgrep -fq -- "--project $WORK/demo" || break; sleep 0.25; done
+pkill -f -- "--project $WORK/demo" 2>/dev/null || true
 [ -f "$SNAP" ] || { echo "smoke: no snapshot written"; cat "$SNAP.log" 2>/dev/null; cat "$WORK/mock.log"; exit 1; }
 
 status=0

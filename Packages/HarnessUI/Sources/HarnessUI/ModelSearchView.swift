@@ -30,7 +30,7 @@ struct ModelSearchView: View {
                 ScrollViewReader { proxy in
                     List(results) { model in
                         Button {
-                            models.selected = model.id
+                            models.select(model.id)
                             isPresented = false
                         } label: {
                             HStack(spacing: 10) {
@@ -51,7 +51,7 @@ struct ModelSearchView: View {
                         .id(model.id)
                     }
                     .listStyle(.plain)
-                    .onAppear { proxy.scrollTo(models.selected, anchor: .center) }
+                    .onAppear { if let selected = models.selected { proxy.scrollTo(selected, anchor: .center) } }
                 }
             }
 

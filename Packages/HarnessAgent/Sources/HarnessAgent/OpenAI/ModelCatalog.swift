@@ -19,17 +19,60 @@ public struct ModelInfo: Identifiable, Sendable, Equatable, Hashable {
 public final class ModelCatalog {
     public static let fallbackModels = ["gpt-5.4", "gpt-5.4-mini", "gpt-5.3-codex", "gpt-5.2"]
 
-    public private(set) var models: [ModelInfo] = ModelCatalog.fallbackModels.map { ModelInfo(id: $0, name: $0) }
-    public var selected: String {
-        didSet { UserDefaults.standard.set(selected, forKey: "model.selected") }
+    /// Where the user's choice for one account type is saved. Each account type keeps its own choice,
+    /// because model ids differ between providers. The older app-wide keys (`model.selected`,
+    /// `model.userSelected`) are ignored; the first could hold a model the app picked on its own.
+    nonisolated public static func selectionKey(for mode: AccountInfo.Mode) -> String {
+        "model.userSelected.\(mode.rawValue)"
     }
+
+    public private(set) var models: [ModelInfo] = ModelCatalog.fallbackModels.map { ModelInfo(id: $0, name: $0) }
+
+    /// The model the user picked for the current account type, or nil until they pick one. The app
+    /// never chooses a model by itself, and a refresh that doesn't list the choice keeps it.
+    /// Change it with `select(_:)`; follow the signed-in account with `setAccount(_:)`.
+    public private(set) var selected: String? = nil
+    /// The account type whose choice `selected` shows. Nil while signed out.
+    public private(set) var accountMode: AccountInfo.Mode? = nil
     public private(set) var isLoading = false
 
-    public init() {
-        selected = UserDefaults.standard.string(forKey: "model.selected") ?? ModelCatalog.fallbackModels[0]
+    private let defaults: UserDefaults
+    /// Debug-only `--model <id>` (or ROKUBI_MODEL): used for every account during that run, never saved.
+    private let launchOverride: String?
+
+    public convenience init(defaults: UserDefaults = .standard) {
+        self.init(defaults: defaults, launchOverride: OpenAIEndpoints.testOverride(env: "ROKUBI_MODEL", flag: "--model"))
+    }
+
+    init(defaults: UserDefaults, launchOverride: String?) {
+        let override = (launchOverride?.isEmpty ?? true) ? nil : launchOverride
+        self.defaults = defaults
+        self.launchOverride = override
+        selected = override
     }
 
     public var selectedInfo: ModelInfo? { models.first { $0.id == selected } }
+
+    /// Switches to the saved choice for this account type, or nil if the user never picked one for it.
+    /// Restoring never writes anything. The model list goes back to the fallback until the next
+    /// refresh, so one provider's models are never offered for another.
+    public func setAccount(_ mode: AccountInfo.Mode?) {
+        guard mode != accountMode else { return }
+        accountMode = mode
+        models = Self.fallbackModels.map { ModelInfo(id: $0, name: $0) }
+        if let launchOverride { selected = launchOverride; return }
+        selected = mode.flatMap { defaults.string(forKey: Self.selectionKey(for: $0)) }
+    }
+
+    /// Records the user's choice for the current account type and saves it so it survives restarts.
+    /// Only user actions call this. With no account signed in there's nowhere to save it, so it lasts
+    /// for this run only. (A `didSet` would also fire for the assignment in `init` under `@Observable`.)
+    public func select(_ id: String?) {
+        selected = id
+        guard let accountMode else { return }
+        let key = Self.selectionKey(for: accountMode)
+        if let id { defaults.set(id, forKey: key) } else { defaults.removeObject(forKey: key) }
+    }
 
     /// Fuzzy search over id, name, and subtitle. Empty query returns the full list.
     public func search(_ query: String, limit: Int = 60) -> [ModelInfo] {
@@ -69,8 +112,7 @@ public final class ModelCatalog {
         }
         let deduped = Self.dedupe(parsed)
         guard !deduped.isEmpty else { return }
-        models = deduped
-        if !models.contains(where: { $0.id == selected }) { selected = models[0].id }
+        models = deduped   // never touches `selected`: only the user chooses a model
     }
 
     // MARK: Helpers
